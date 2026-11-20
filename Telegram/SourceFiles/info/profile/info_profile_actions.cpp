@@ -1710,6 +1710,10 @@ BlockPart DetailsFiller::makeInfo() {
 				AddPhoneSpoilerMenu(request.menu, user);
 			};
 			phoneLabel->setContextMenuHook(hook);
+			SetupPhoneSpoilerClick(phoneLabel, user, [=] {
+				controller->showToast(
+					tr::lng_collectible_phone_copied(tr::now));
+			});
 		}
 		auto label = user->isBot()
 			? tr::lng_info_about_label()

@@ -8,6 +8,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "info/profile/info_profile_phone_menu.h"
 
 #include "data/data_user.h"
+#include "info/profile/info_profile_values.h"
 #include "lang/lang_keys.h"
 #include "main/main_app_config.h"
 #include "main/main_app_config_values.h"
@@ -21,6 +22,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_chat.h" // expandedMenuSeparator.
 #include "styles/style_chat_helpers.h"
 #include "styles/style_menu_icons.h"
+
+#include <QtGui/QMouseEvent>
+#include <QtWidgets/QApplication>
+#include <rpl/rpl.h>
 
 namespace Info {
 namespace Profile {
@@ -153,9 +158,7 @@ void AddPhoneSpoilerMenu(
 	}
 	const auto session = &user->session();
 	const auto toggle = [=] {
-		auto &settings = session->settings();
-		settings.setPhoneNumberHidden(!settings.phoneNumberHidden());
-		session->saveSettingsDelayed();
+		TogglePhoneSpoiler(user);
 	};
 	Menu::AddCheckedAction(
 		menu,
@@ -163,6 +166,56 @@ void AddPhoneSpoilerMenu(
 		toggle,
 		&st::menuIconSpoiler,
 		session->settings().phoneNumberHidden());
+}
+
+void TogglePhoneSpoiler(not_null<UserData*> user) {
+	auto &settings = user->session().settings();
+	settings.setPhoneNumberHidden(!settings.phoneNumberHidden());
+	user->session().saveSettingsDelayed();
+}
+
+bool CopyAndHidePhoneSpoiler(not_null<UserData*> user) {
+	if (user->session().settings().phoneNumberHidden()) {
+		return false;
+	}
+	CopyPhoneToClipboard(PhoneValue(user));
+	TogglePhoneSpoiler(user);
+	return true;
+}
+
+void SetupPhoneSpoilerClick(
+		not_null<Ui::FlatLabel*> label,
+		not_null<UserData*> user,
+		Fn<void()> copied) {
+	if (!user->isSelf()) {
+		return;
+	}
+	const auto press = label->lifetime().make_state<QPoint>();
+	label->events(
+	) | rpl::on_next([=](not_null<QEvent*> event) {
+		const auto type = event->type();
+		if (type != QEvent::MouseButtonPress
+			&& type != QEvent::MouseButtonRelease) {
+			return;
+		}
+		const auto mouse = static_cast<QMouseEvent*>(event.get());
+		if (mouse->button() != Qt::LeftButton) {
+			return;
+		}
+		if (type == QEvent::MouseButtonPress) {
+			*press = mouse->pos();
+			return;
+		}
+		if ((mouse->pos() - *press).manhattanLength()
+			> QApplication::startDragDistance()) {
+			return;
+		}
+		if (user->session().settings().phoneNumberHidden()) {
+			TogglePhoneSpoiler(user);
+		} else if (CopyAndHidePhoneSpoiler(user) && copied) {
+			copied();
+		}
+	}, label->lifetime());
 }
 
 } // namespace Profile

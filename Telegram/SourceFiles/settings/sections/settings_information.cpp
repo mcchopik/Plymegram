@@ -590,6 +590,14 @@ void SetupRows(
 			Ui::MakeInformBox(tr::lng_change_phone_error()));
 		controller->window().activate();
 	};
+	const auto togglePhone = [=] {
+		if (Info::Profile::CopyAndHidePhoneSpoiler(self)) {
+			controller->showToast(
+				tr::lng_collectible_phone_copied(tr::now));
+		} else {
+			Info::Profile::TogglePhoneSpoiler(self);
+		}
+	};
 	const auto phoneButton = AddRow(
 		container,
 		tr::lng_settings_phone_label(),
@@ -597,10 +605,13 @@ void SetupRows(
 			self,
 			Info::Profile::PhoneValue(self)),
 		tr::lng_profile_copy_phone(tr::now),
-		showChangePhone,
+		togglePhone,
 		{ &st::menuIconPhone },
 		true,
 		[=](not_null<Ui::PopupMenu*> menu) {
+			menu->addAction(
+				tr::lng_settings_change_phone(tr::now),
+				showChangePhone);
 			Info::Profile::AddPhoneSpoilerMenu(menu, self);
 		},
 		&st::menuIconCopy);

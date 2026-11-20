@@ -253,7 +253,7 @@ private:
 
 	std::vector<int32> _moderateCommonGroups;
 
-	rpl::variable<bool> _phoneNumberHidden = false;
+	rpl::variable<bool> _phoneNumberHidden = true;
 
 	std::vector<Data::ReactionId> _extraFavoriteReactions;
 

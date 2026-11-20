@@ -870,6 +870,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_settings_name_label" = "Name";
 "lng_settings_username_label" = "Username";
 "lng_settings_phone_label" = "Phone number";
+"lng_settings_change_phone" = "Change phone number";
 "lng_settings_username_add" = "Add username";
 "lng_settings_username_about" = "Username lets people contact you on Telegram without needing your phone number.";
 "lng_settings_birthday_label" = "Date of Birth";

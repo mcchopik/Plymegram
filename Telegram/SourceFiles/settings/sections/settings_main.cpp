@@ -193,6 +193,9 @@ Cover::Cover(
 		Info::Profile::AddPhoneSpoilerMenu(request.menu, _user);
 	};
 	_phone->setContextMenuHook(hook);
+	Info::Profile::SetupPhoneSpoilerClick(_phone, _user, [=] {
+		_controller->showToast(tr::lng_collectible_phone_copied(tr::now));
+	});
 
 	initViewers();
 	setupChildGeometry();

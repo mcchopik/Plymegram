@@ -301,7 +301,7 @@ void SessionSettings::addFromSerialized(
 	qint32 setupEmailState = 0;
 	std::vector<int32> moderateCommonGroups;
 	qint32 disableSharingBoxShowsCount = 0;
-	qint32 phoneNumberHidden = 0;
+	qint32 phoneNumberHidden = 1;
 	std::vector<Data::ReactionId> extraFavoriteReactions;
 	qint32 stashHintShowsCount = 0;
 
