@@ -316,12 +316,7 @@ bool SponsoredMessages::canHaveFor(not_null<HistoryItem*> item) const {
 }
 
 bool SponsoredMessages::isTopBarFor(not_null<History*> history) const {
-	if (peerIsUser(history->peer->id)) {
-		if (const auto user = history->peer->asUser()) {
-			return user->isBot();
-		}
-	}
-	return false;
+	return canHaveFor(history);
 }
 
 void SponsoredMessages::request(not_null<History*> history, Fn<void()> done) {
@@ -452,12 +447,8 @@ void SponsoredMessages::parse(
 		list.received = crl::now();
 		if (const auto postsBetween = data.vposts_between()) {
 			list.postsBetween = postsBetween->v;
-			list.state = State::InjectToMiddle;
-		} else {
-			list.state = history->peer->isChannel()
-				? State::AppendToEnd
-				: State::AppendToTopBar;
 		}
+		list.state = State::AppendToTopBar;
 		for (const auto &message : messages) {
 			append([=] {
 				return &_data[history].entries;
