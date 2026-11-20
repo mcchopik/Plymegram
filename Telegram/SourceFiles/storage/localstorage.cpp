@@ -1236,9 +1236,7 @@ void InitialLoadTheme() {
 }
 
 bool ApplyDefaultNightMode() {
-	const auto NightByDefault = Platform::IsMacStoreBuild();
-	if (!NightByDefault
-		|| Window::Theme::IsNightMode()
+	if (Window::Theme::IsNightMode()
 		|| _themeKeyDay
 		|| _themeKeyNight
 		|| _themeKeyLegacy) {
