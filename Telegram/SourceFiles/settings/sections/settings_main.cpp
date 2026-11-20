@@ -332,7 +332,6 @@ void Cover::updatePhoneText() {
 	} else {
 		_phone->setText(_phoneText);
 	}
-	refreshPhoneGeometry(width());
 }
 
 void Cover::refreshPhoneGeometry(int newWidth) {
