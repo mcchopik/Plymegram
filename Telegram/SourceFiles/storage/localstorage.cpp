@@ -373,7 +373,6 @@ void start() {
 		applyReadContext(std::move(context));
 
 		_settingsRewriteNeeded = true;
-		ApplyDefaultNightMode();
 		return;
 	}
 	LOG(("App Info: reading settings..."));
@@ -1242,7 +1241,6 @@ bool ApplyDefaultNightMode() {
 		|| _themeKeyLegacy) {
 		return false;
 	}
-	Core::App().startSettingsAndBackground();
 	Window::Theme::ToggleNightMode();
 	Window::Theme::KeepApplied();
 	return true;

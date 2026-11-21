@@ -28,6 +28,20 @@ extern "C" {
 #include <libavutil/log.h>
 } // extern "C"
 
+#ifdef Q_OS_WIN
+#include <windows.h>
+
+#include <algorithm>
+#include <atomic>
+#include <csignal>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <exception>
+#include <string>
+#endif // Q_OS_WIN
+
 namespace Core {
 namespace {
 
@@ -343,8 +357,8 @@ void Launcher::init() {
 	prepareSettings();
 	initQtMessageLogging();
 
-	QApplication::setApplicationName(u"Plumegram"_q);
-	QApplication::setApplicationDisplayName(u"Plumegram"_q);
+	QApplication::setApplicationName(u"Plymegram"_q);
+	QApplication::setApplicationDisplayName(u"Plymegram"_q);
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	// fallback session management is useless for tdesktop since it doesn't have
@@ -384,6 +398,108 @@ void Launcher::initHighDpi() {
 	}
 }
 
+#ifdef Q_OS_WIN
+namespace {
+
+std::wstring CrashLogPath;
+std::atomic<bool> CrashLogWriting = false;
+
+void WriteCrashLogRaw(const char *data, int size) {
+	if (size <= 0 || CrashLogWriting.exchange(true)) {
+		return;
+	}
+	const auto path = CrashLogPath.empty()
+		? L"log.txt"
+		: CrashLogPath.c_str();
+	HANDLE file = CreateFileW(
+		path,
+		FILE_APPEND_DATA,
+		FILE_SHARE_READ | FILE_SHARE_WRITE,
+		nullptr,
+		OPEN_ALWAYS,
+		FILE_ATTRIBUTE_NORMAL,
+		nullptr);
+	if (file == INVALID_HANDLE_VALUE) {
+		return;
+	}
+	DWORD written = 0;
+	WriteFile(file, data, static_cast<DWORD>(size), &written, nullptr);
+	CloseHandle(file);
+}
+
+void WriteCrashLog(const char *text) {
+	WriteCrashLogRaw(text, static_cast<int>(strlen(text)));
+}
+
+LONG WINAPI CrashExceptionFilter(EXCEPTION_POINTERS *exceptionInfo) {
+	if (!exceptionInfo || !exceptionInfo->ExceptionRecord) {
+		return EXCEPTION_CONTINUE_SEARCH;
+	}
+	const auto record = exceptionInfo->ExceptionRecord;
+	char buffer[1024] = {};
+	const auto length = std::snprintf(
+		buffer,
+		sizeof(buffer),
+		"[CRASH] ExceptionCode=0x%08lX ExceptionAddress=%p Flags=0x%08lX",
+		static_cast<unsigned long>(record->ExceptionCode),
+		record->ExceptionAddress,
+		static_cast<unsigned long>(record->ExceptionFlags));
+	auto used = (length > 0)
+		? std::min(length, static_cast<int>(sizeof(buffer)) - 1)
+		: 0;
+	for (auto i = 0; i != static_cast<int>(record->NumberParameters); ++i) {
+		if (used >= static_cast<int>(sizeof(buffer)) - 1) {
+			break;
+		}
+		const auto added = std::snprintf(
+			buffer + used,
+			sizeof(buffer) - used,
+			" %d=0x%p",
+			i,
+			reinterpret_cast<void*>(record->ExceptionInformation[i]));
+		if (added > 0) {
+			used += std::min(
+				added,
+				static_cast<int>(sizeof(buffer)) - 1 - used);
+		}
+	}
+	if (used < static_cast<int>(sizeof(buffer)) - 1) {
+		buffer[used++] = '\n';
+	}
+	WriteCrashLogRaw(buffer, used);
+	return EXCEPTION_EXECUTE_HANDLER;
+}
+
+void InstallCrashLogHandler() {
+	const auto path = cWorkingDir() + u"log.txt"_q;
+	CrashLogPath = path.toStdWString();
+	SetUnhandledExceptionFilter(CrashExceptionFilter);
+	std::set_terminate([] {
+		WriteCrashLog("[CRASH] std::terminate called\n");
+		std::_Exit(3);
+	});
+	std::signal(SIGABRT, [](int) {
+		WriteCrashLog("[CRASH] SIGABRT\n");
+		std::_Exit(3);
+	});
+	_set_invalid_parameter_handler([](
+			const wchar_t *,
+			const wchar_t *,
+			const wchar_t *,
+			unsigned int,
+			uintptr_t) {
+		WriteCrashLog("[CRASH] Invalid CRT parameter\n");
+		std::_Exit(3);
+	});
+	_set_purecall_handler([] {
+		WriteCrashLog("[CRASH] Pure virtual call\n");
+		std::_Exit(3);
+	});
+}
+
+} // namespace
+#endif // Q_OS_WIN
+
 int Launcher::exec() {
 	init();
 
@@ -399,6 +515,9 @@ int Launcher::exec() {
 
 	// Must be started before Platform is started.
 	Logs::start();
+#ifdef Q_OS_WIN
+	InstallCrashLogHandler();
+#endif // Q_OS_WIN
 	base::options::init(cWorkingDir() + "tdata/experimental_options.json");
 
 	// Must be called after options are inited.

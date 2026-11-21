@@ -566,6 +566,7 @@ void Application::startDomain() {
 void Application::startSettingsAndBackground() {
 	Local::rewriteSettingsIfNeeded();
 	Window::Theme::Background()->start();
+	Local::ApplyDefaultNightMode();
 	checkSystemDarkMode();
 	Ui::SetScreenReaderModeDisabled(
 		settings().readPref<bool>(kScreenReaderModeDisabledKey));

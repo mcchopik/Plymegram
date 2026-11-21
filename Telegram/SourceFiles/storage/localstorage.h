@@ -52,6 +52,8 @@ void start();
 void sync();
 void finish();
 
+bool ApplyDefaultNightMode();
+
 void writeSettings();
 void rewriteSettingsIfNeeded();
 
