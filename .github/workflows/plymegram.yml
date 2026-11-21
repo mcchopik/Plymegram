@@ -87,7 +87,7 @@ jobs:
       - name: Prepare libraries.
         run: |
           set CARGO_INCREMENTAL=0
-          call "%TBUILD%\%REPO_NAME%\Telegram\build\prepare\win.bat" silent
+          call "%TBUILD%\%REPO_NAME%\Telegram\build\prepare\win.bat" silent skip-breakpad
 
       - name: Free up some disk space.
         shell: bash

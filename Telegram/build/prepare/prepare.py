@@ -61,6 +61,7 @@ usedPrefix = os.path.realpath(os.path.join(libsDir, 'local'))
 
 optionsList = [
     'skip-release',
+    'skip-breakpad',
     'build-stackwalk',
     'qt-asserts',
 ]
@@ -334,6 +335,8 @@ def filterByPlatform(commands):
     return [result, dependencies, version]
 
 def stage(name, commands, location = 'Libraries'):
+    if name == 'breakpad' and 'skip-breakpad' in options:
+        return
     if location == 'Libraries':
         directory = libsDir
     elif location == 'ThirdParty':
