@@ -81,8 +81,8 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ${{ env.TBUILD }}\Libraries
-          key: ${{ runner.os }}-x64-libs-release-v1-${{ hashFiles('TBuild/Plymegram/Telegram/build/prepare/prepare.py', 'TBuild/Plymegram/Telegram/build/qt_version.py') }}
-          restore-keys: ${{ runner.os }}-x64-libs-release-v1-
+          key: ${{ runner.os }}-x64-libs-${{ hashFiles('TBuild/Plymegram/Telegram/build/prepare/prepare.py', 'TBuild/Plymegram/Telegram/build/qt_version.py') }}
+          restore-keys: ${{ runner.os }}-x64-libs-
 
       - name: Prepare libraries.
         run: |
