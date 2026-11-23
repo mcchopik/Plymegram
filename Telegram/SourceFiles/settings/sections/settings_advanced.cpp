@@ -88,6 +88,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 namespace Settings {
 namespace {
 
+constexpr auto kInterfaceOption = "plymegram-interface";
+
 using namespace Builder;
 
 #if defined Q_OS_MACOS && !defined OS_MAC_STORE
@@ -923,8 +925,7 @@ void BuildPerformanceSection(SectionBuilder &builder) {
 		.title = tr::lng_settings_interface_menu(),
 		.st = &st::settingsButtonNoIcon,
 		.onClick = [=] {
-			const auto current = base::options::lookup<QString>(
-				u"plymegram-interface"_q).value().toInt();
+			const auto current = base::options::lookup<QString>(kInterfaceOption).value().toInt();
 			const auto options = std::vector<QString>{
 				tr::lng_settings_interface_original(tr::now),
 				tr::lng_settings_interface_expressive(tr::now),
@@ -935,8 +936,7 @@ void BuildPerformanceSection(SectionBuilder &builder) {
 				.options = options,
 				.initialSelection = current,
 				.callback = [](int selection) {
-					base::options::lookup<QString>(
-						u"plymegram-interface"_q).set(QString::number(selection));
+					base::options::lookup<QString>(kInterfaceOption).set(QString::number(selection));
 					PowerSaving::Set(selection == 2
 						? PowerSaving::kAll
 						: PowerSaving::Flags());

@@ -145,6 +145,8 @@ void SetCrashAnnotationsGL() {
 #endif // DESKTOP_APP_USE_ANGLE
 }
 
+constexpr auto kInterfaceOption = "plymegram-interface";
+
 base::options::toggle OptionSkipUrlSchemeRegister({
 	.id = kOptionSkipUrlSchemeRegister,
 	.name = "Skip URL scheme register",
@@ -371,8 +373,7 @@ void Application::run() {
 		PowerSaving::SetForceAll(saving && !ignore);
 	}, _lifetime);
 
-	const auto interfaceMode = base::options::lookup<QString>(
-		u"plymegram-interface"_q).value().toInt();
+	const auto interfaceMode = base::options::lookup<QString>(kInterfaceOption).value().toInt();
 	if (interfaceMode == 2) {
 		PowerSaving::Set(PowerSaving::kAll);
 	} else if (interfaceMode == 1) {
