@@ -973,7 +973,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_settings_interface_title" = "Choose Interface";
 "lng_settings_interface_about" = "Original keeps all effects. Material 3 Expressive uses a bright accent. Super Light disables heavy visual effects to save memory and CPU.";
 "lng_settings_interface_original" = "Original";
-"lng_settings_interface_expressive" = "Material 3 Expressive";
+"lng_settings_interface_expressive" = "Material Design 3 Expressive";
 "lng_settings_interface_lite" = "Super Light (low resource)";
 "lng_settings_power_title" = "Power Usage";
 "lng_settings_power_subtitle" = "Power saving options";

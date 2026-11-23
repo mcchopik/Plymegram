@@ -377,8 +377,8 @@ void Application::run() {
 		PowerSaving::Set(PowerSaving::kAll);
 	} else if (interfaceMode == 1) {
 		const auto path = Window::Theme::IsNightMode()
-			? u":/gui/google-dark.tdesktop-theme"_q
-			: u":/gui/google-day.tdesktop-theme"_q;
+			? u":/gui/m3expressive-dark.tdesktop-theme"_q
+			: u":/gui/m3expressive-day.tdesktop-theme"_q;
 		Window::Theme::ToggleNightMode(path);
 	}
 
