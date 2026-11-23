@@ -47,11 +47,11 @@ rpl::producer<TextWithEntities> Text2() {
 		lt_gpl_link,
 		rpl::single(tr::link(
 			"GNU GPL",
-			"https://github.com/telegramdesktop/tdesktop/blob/master/LICENSE")),
+			"https://github.com/mcchopik/Plymegram/blob/dev/LICENSE")),
 		lt_github_link,
 		rpl::single(tr::link(
 			"GitHub",
-			"https://github.com/telegramdesktop/tdesktop")),
+			"https://github.com/mcchopik/Plymegram")),
 		tr::marked);
 }
 
@@ -107,7 +107,7 @@ void AboutBox(not_null<Ui::GenericBox*> box) {
 			box->getDelegate()->show(
 				Ui::MakeInformBox(
 					"The link to the current private alpha "
-					"version of Telegram Desktop was copied "
+					"version of Plymegram Desktop was copied "
 					"to the clipboard."));
 		} else {
 			File::OpenUrl(Core::App().changelogLink());
@@ -134,7 +134,7 @@ void AboutBox(not_null<Ui::GenericBox*> box) {
 }
 
 QString telegramFaqLink() {
-	const auto result = u"https://telegram.org/faq"_q;
+	const auto result = u"https://t.me/Plymegram"_q;
 	const auto langpacked = [&](const char *language) {
 		return result + '/' + language;
 	};
