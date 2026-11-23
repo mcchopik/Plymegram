@@ -376,10 +376,14 @@ void Application::run() {
 	const auto interfaceMode = base::options::template lookup<QString>(kInterfaceOption).value().toInt();
 	if (interfaceMode == 2) {
 		PowerSaving::Set(PowerSaving::kAll);
-	} else if (interfaceMode == 1) {
-		const auto path = Window::Theme::IsNightMode()
-			? u":/gui/m3expressive-dark.tdesktop-theme"_q
-			: u":/gui/m3expressive-day.tdesktop-theme"_q;
+	} else if (interfaceMode == 1 || interfaceMode == 3) {
+		const auto prefix = interfaceMode == 3
+			? u"hyperos"_q
+			: u"m3expressive"_q;
+		const auto path = u":/gui/"_q + prefix
+			+ (Window::Theme::IsNightMode()
+				? u"-dark.tdesktop-theme"_q
+				: u"-day.tdesktop-theme"_q);
 		Window::Theme::ToggleNightMode(path);
 	}
 

@@ -13,7 +13,7 @@ concurrency:
 jobs:
   build:
     name: Portable build
-    runs-on: windows-latest
+    runs-on: windows-latest-8-cores
 
     env:
       TBUILD: ${{ github.workspace }}\TBuild
@@ -115,7 +115,7 @@ jobs:
       - name: Build.
         run: |
           cd /d "%TBUILD%\%REPO_NAME%"
-          cmake --build out --config Release --target Telegram --parallel %NUMBER_OF_PROCESSORS% -- /p:UseMultiToolTask=true /p:EnforceProcessCountAcrossBuilds=true
+          cmake --build out --config Release --target Telegram --parallel %NUMBER_OF_PROCESSORS% -- /m:%NUMBER_OF_PROCESSORS% /p:UseMultiToolTask=true /p:EnforceProcessCountAcrossBuilds=true /p:CL_MPCOUNT=%NUMBER_OF_PROCESSORS% /p:IncrementalLinking=false /p:DebugSymbols=false
 
       - name: Compress executable (UPX).
         shell: pwsh

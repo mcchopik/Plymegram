@@ -931,6 +931,7 @@ void BuildPerformanceSection(SectionBuilder &builder) {
 				tr::lng_settings_interface_original(tr::now),
 				tr::lng_settings_interface_expressive(tr::now),
 				tr::lng_settings_interface_lite(tr::now),
+				tr::lng_settings_interface_hyperos(tr::now),
 			};
 			controller->window().show(Box(SingleChoiceBox, SingleChoiceBoxArgs{
 				.title = tr::lng_settings_interface_title(),
@@ -941,10 +942,14 @@ void BuildPerformanceSection(SectionBuilder &builder) {
 					PowerSaving::Set(selection == 2
 						? PowerSaving::kAll
 						: PowerSaving::Flags());
-					if (selection == 1) {
-						const auto path = Window::Theme::IsNightMode()
-							? u":/gui/m3expressive-dark.tdesktop-theme"_q
-							: u":/gui/m3expressive-day.tdesktop-theme"_q;
+					if (selection == 1 || selection == 3) {
+						const auto prefix = selection == 3
+							? u"hyperos"_q
+							: u"m3expressive"_q;
+						const auto path = u":/gui/"_q + prefix
+							+ (Window::Theme::IsNightMode()
+								? u"-dark.tdesktop-theme"_q
+								: u"-day.tdesktop-theme"_q);
 						Window::Theme::ToggleNightMode(path);
 					}
 				},

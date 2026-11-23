@@ -975,6 +975,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_settings_interface_original" = "Original";
 "lng_settings_interface_expressive" = "Material Design 3 Expressive";
 "lng_settings_interface_lite" = "Super Light (low resource)";
+"lng_settings_interface_hyperos" = "HyperOS 4 Glass";
 "lng_settings_fork_menu" = "Fork Features";
 "lng_settings_fork_title" = "Plymegram Fork Features";
 "lng_settings_fork_about" = "Extra toggles from community forks, all kept inside this client.";

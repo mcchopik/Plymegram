@@ -1,0 +1,136 @@
+name: Plymegram Windows x64 (clang-cl fast build)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Portable build (clang-cl + lld)
+    runs-on: windows-latest-8-cores
+
+    env:
+      TBUILD: ${{ github.workspace }}\TBuild
+      REPO_NAME: Plymegram
+      CC: clang-cl
+      CXX: clang-cl
+
+    defaults:
+      run:
+        shell: cmd
+
+    steps:
+      - name: Clean up preinstalled software.
+        shell: pwsh
+        run: |
+          $before = (Get-PSDrive C).Free / 1GB
+          Get-Service docker -ErrorAction SilentlyContinue | Stop-Service -ErrorAction SilentlyContinue
+          wsl --shutdown 2> $null
+          Remove-Item "C:\Android\android-sdk", "C:\Program Files\dotnet", "C:\Miniconda", "C:\msys64", "$env:USERPROFILE\.cargo", "$env:USERPROFILE\.rustup", "$env:LOCALAPPDATA\Docker", "C:\ProgramData\DockerDesktop", "C:\Program Files\PostgreSQL", "C:\PostgreSQL", "C:\Program Files\MongoDB", "C:\Program Files\MySQL" -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item "C:\ghcup", "C:\cabal", "C:\vcpkg", "C:\tools\kotlinc", "C:\tools\php", "C:\tools\Apache24", "C:\tools\nginx-*", "C:\selenium", "C:\SeleniumWebDrivers", "C:\Program Files\R", "C:\Program Files (x86)\R", "C:\rtools*", "C:\Program Files\Google\Chrome*", "C:\Program Files (x86)\Google\Chrome*", "C:\Program Files\Mozilla Firefox*", "C:\ProgramData\Package Cache" -Recurse -Force -ErrorAction SilentlyContinue
+          Get-ChildItem "C:\ProgramData\Microsoft\VisualStudio\Packages" -Exclude _Instances -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item C:\hostedtoolcache\windows\Go*, C:\hostedtoolcache\windows\Ruby*, C:\hostedtoolcache\windows\PyPy*, C:\hostedtoolcache\windows\Java_*, C:\hostedtoolcache\windows\NuGet* -Recurse -Force -ErrorAction SilentlyContinue
+          Write-Host ('{0:N1} GB -> {1:N1} GB free' -f $before, ((Get-PSDrive C).Free / 1GB))
+          exit 0
+
+      - name: Prepare directories.
+        run: |
+          mkdir "%TBUILD%\Libraries\win64"
+          echo LibrariesPath=%TBUILD%\Libraries\win64>>%GITHUB_ENV%
+
+      - name: Checkout.
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          path: TBuild/Plymegram
+
+      - name: Read SDK version.
+        shell: bash
+        run: |
+          DOCPATH=$TBUILD/$REPO_NAME/docs/building-win.md
+          SDK="$(grep "SDK version" $DOCPATH | sed -r 's/.*\*\*(.*)\*\* SDK version.*/\1/')"
+          echo "SDK=$SDK" >> $GITHUB_ENV
+
+      - name: Native Tools Command Prompt.
+        uses: Eden-CI/msvc-dev-cmd@master
+        with:
+          arch: x64
+          sdk: ${{ env.SDK }}
+          toolset: 14.44
+
+      - name: NuGet sources.
+        run: |
+          nuget sources Disable -Name "Microsoft Visual Studio Offline Packages"
+          nuget sources Add -Source https://api.nuget.org/v3/index.json & exit 0
+
+      - name: ThirdParty cache.
+        uses: actions/cache@v6
+        with:
+          path: ${{ env.TBUILD }}\ThirdParty
+          key: ${{ runner.os }}-x64-thirdparty-${{ hashFiles('TBuild/Plymegram/Telegram/build/prepare/prepare.py', 'TBuild/Plymegram/Telegram/build/qt_version.py') }}
+          restore-keys: ${{ runner.os }}-x64-thirdparty-
+
+      - name: Libraries cache.
+        uses: actions/cache@v6
+        with:
+          path: ${{ env.TBUILD }}\Libraries
+          key: ${{ runner.os }}-x64-libs-${{ hashFiles('TBuild/Plymegram/Telegram/build/prepare/prepare.py', 'TBuild/Plymegram/Telegram/build/qt_version.py') }}
+          restore-keys: ${{ runner.os }}-x64-libs-
+
+      - name: Prepare libraries.
+        run: |
+          set CARGO_INCREMENTAL=0
+          call "%TBUILD%\%REPO_NAME%\Telegram\build\prepare\win.bat" silent skip-breakpad
+
+      - name: Configure (clang-cl + Ninja + lld).
+        shell: cmd
+        run: |
+          cd /d "%TBUILD%\%REPO_NAME%\Telegram"
+          set CC=clang-cl
+          set CXX=clang-cl
+          call configure.bat x64 ^
+          -G Ninja ^
+          -D CMAKE_C_COMPILER=clang-cl ^
+          -D CMAKE_CXX_COMPILER=clang-cl ^
+          -D CMAKE_LINKER=lld-link ^
+          -D CMAKE_MSVC_DEBUG_INFORMATION_FORMAT= ^
+          -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON ^
+          -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON ^
+          -D DESKTOP_APP_ENABLE_LTO=OFF ^
+          -D TDESKTOP_API_ID=%TDESKTOP_API_ID% ^
+          -D TDESKTOP_API_HASH=%TDESKTOP_API_HASH%
+        env:
+          TDESKTOP_API_ID: ${{ secrets.TDESKTOP_API_ID }}
+          TDESKTOP_API_HASH: ${{ secrets.TDESKTOP_API_HASH }}
+
+      - name: Build.
+        run: |
+          cd /d "%TBUILD%\%REPO_NAME%"
+          cmake --build out --config Release --target Telegram --parallel 16
+
+      - name: Compress executable (UPX).
+        shell: pwsh
+        run: |
+          try { choco install upx -y | Out-Null } catch {}
+          if (Get-Command upx -ErrorAction SilentlyContinue) {
+            upx --best "%TBUILD%\%REPO_NAME%\out\Release\Plymegram.exe"
+          }
+
+      - name: Collect artifact.
+        run: |
+          mkdir artifact
+          copy "%TBUILD%\%REPO_NAME%\out\Release\Plymegram.exe" artifact\
+
+      - name: Upload artifact.
+        uses: actions/upload-artifact@v7
+        with:
+          name: Plymegram-Windows-x64-clang
+          path: artifact\Plymegram.exe
+          if-no-files-found: error
+          retention-days: 14
