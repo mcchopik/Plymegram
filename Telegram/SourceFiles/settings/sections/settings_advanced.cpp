@@ -91,6 +91,14 @@ namespace {
 
 constexpr auto kInterfaceOption = "plymegram-interface";
 
+int InterfaceMode() {
+	return base::options::lookup<QString>(kInterfaceOption).value().toInt();
+}
+
+void SetInterfaceMode(int mode) {
+	base::options::lookup<QString>(kInterfaceOption).set(QString::number(mode));
+}
+
 using namespace Builder;
 
 #if defined Q_OS_MACOS && !defined OS_MAC_STORE
@@ -861,7 +869,7 @@ void BuildANGLEOption(SectionBuilder &builder) {
 				};
 				SingleChoiceBox(box, {
 					.title = tr::lng_settings_angle_backend(),
-					.options = choices,
+					.options = options,
 					.initialSelection = backendIndex,
 					.callback = save,
 				});
@@ -926,8 +934,8 @@ void BuildPerformanceSection(SectionBuilder &builder) {
 		.title = tr::lng_settings_interface_menu(),
 		.st = &st::settingsButtonNoIcon,
 		.onClick = [=] {
-			const auto current = base::options::template lookup<QString>(kInterfaceOption).value().toInt();
-			const auto choices = std::vector<QString>{
+			const auto current = InterfaceMode();
+			const auto interfaceChoices = std::vector<QString>{
 				tr::lng_settings_interface_original(tr::now),
 				tr::lng_settings_interface_expressive(tr::now),
 				tr::lng_settings_interface_lite(tr::now),
@@ -935,10 +943,10 @@ void BuildPerformanceSection(SectionBuilder &builder) {
 			};
 			controller->window().show(Box(SingleChoiceBox, SingleChoiceBoxArgs{
 				.title = tr::lng_settings_interface_title(),
-				.options = choices,
+				.options = interfaceChoices,
 				.initialSelection = current,
 				.callback = [](int selection) {
-					base::options::template lookup<QString>(kInterfaceOption).set(QString::number(selection));
+					SetInterfaceMode(selection);
 					PowerSaving::Set(selection == 2
 						? PowerSaving::kAll
 						: PowerSaving::Flags());

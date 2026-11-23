@@ -32,14 +32,14 @@ void AddToggle(
 		rpl::producer<QString> text,
 		const char *option,
 		Fn<void(bool)> apply = nullptr) {
-	const auto &options = base::options::template lookup<bool>(option);
+	const auto &storedOption = base::options::lookup<bool>(option);
 	const auto button = container->add(object_ptr<Ui::SettingsButton>(
 		container,
 		std::move(text),
 		st::settingsButtonNoIcon));
-	button->toggleOn(rpl::single(options.value()));
+	button->toggleOn(rpl::single(storedOption.value()));
 	button->toggledValue() | rpl::on_next([option, apply](bool value) {
-		base::options::template lookup<bool>(option).set(value);
+		base::options::lookup<bool>(option).set(value);
 		if (apply) {
 			apply(value);
 		}
