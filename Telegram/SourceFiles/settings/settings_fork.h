@@ -9,8 +9,14 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "ui/layers/generic_box.h"
 
+namespace Main {
+class Session;
+} // namespace Main
+
 namespace Settings {
 
-void ForkFeaturesBox(not_null<Ui::GenericBox*> box);
+void ForkFeaturesBox(
+	not_null<Ui::GenericBox*> box,
+	not_null<Main::Session*> session);
 
 } // namespace Settings

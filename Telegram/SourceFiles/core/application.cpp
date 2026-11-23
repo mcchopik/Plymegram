@@ -373,7 +373,7 @@ void Application::run() {
 		PowerSaving::SetForceAll(saving && !ignore);
 	}, _lifetime);
 
-	const auto interfaceMode = base::options::lookup<QString>(kInterfaceOption).value().toInt();
+	const auto interfaceMode = base::options::template lookup<QString>(kInterfaceOption).value().toInt();
 	if (interfaceMode == 2) {
 		PowerSaving::Set(PowerSaving::kAll);
 	} else if (interfaceMode == 1) {

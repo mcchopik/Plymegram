@@ -1,9 +1,6 @@
 name: Plymegram Windows x64
 
 on:
-  push:
-    branches:
-      - dev
   workflow_dispatch:
 
 permissions:
@@ -83,6 +80,13 @@ jobs:
           path: ${{ env.TBUILD }}\Libraries
           key: ${{ runner.os }}-x64-libs-${{ hashFiles('TBuild/Plymegram/Telegram/build/prepare/prepare.py', 'TBuild/Plymegram/Telegram/build/qt_version.py') }}
           restore-keys: ${{ runner.os }}-x64-libs-
+
+      - name: Build objects cache.
+        uses: actions/cache@v6
+        with:
+          path: ${{ env.TBUILD }}\out
+          key: ${{ runner.os }}-x64-objects-${{ hashFiles('TBuild/Plymegram/Telegram/SourceFiles/**/*.cpp', 'TBuild/Plymegram/Telegram/SourceFiles/**/*.h', 'TBuild/Plymegram/Telegram/CMakeLists.txt', 'TBuild/Plymegram/Telegram/Resources/**') }}
+          restore-keys: ${{ runner.os }}-x64-objects-
 
       - name: Prepare libraries.
         run: |

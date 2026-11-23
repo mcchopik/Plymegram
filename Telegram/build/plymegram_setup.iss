@@ -25,7 +25,6 @@ UninstallDisplayName={#MyAppName}
 UninstallDisplayIcon={app}\{#MyAppExeName}
 Compression=lzma2
 SolidCompression=yes
-LZMA2DictionarySize=64
 WizardStyle=modern
 WizardImageFile={#SourcePath}wizard-image.bmp
 WizardSmallImageFile={#SourcePath}wizard-small-image.bmp
@@ -47,8 +46,6 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "{#ReleasePath}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#ReleasePath}\x64\TelegramWidgetHelper.exe"; DestDir: "{app}\x64"; Flags: ignoreversion; SkipIfNotExists: yes
-Source: "{#ReleasePath}\x64\d3d\d3dcompiler_47.dll"; DestDir: "{app}\x64\d3d"; Flags: ignoreversion; SkipIfNotExists: yes
 
 [Icons]
 Name: "{group}\{#MyAppShortName}"; Filename: "{app}\{#MyAppExeName}"

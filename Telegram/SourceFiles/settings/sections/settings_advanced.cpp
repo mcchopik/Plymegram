@@ -861,7 +861,7 @@ void BuildANGLEOption(SectionBuilder &builder) {
 				};
 				SingleChoiceBox(box, {
 					.title = tr::lng_settings_angle_backend(),
-					.options = options,
+					.options = choices,
 					.initialSelection = backendIndex,
 					.callback = save,
 				});
@@ -926,18 +926,18 @@ void BuildPerformanceSection(SectionBuilder &builder) {
 		.title = tr::lng_settings_interface_menu(),
 		.st = &st::settingsButtonNoIcon,
 		.onClick = [=] {
-			const auto current = base::options::lookup<QString>(kInterfaceOption).value().toInt();
-			const auto options = std::vector<QString>{
+			const auto current = base::options::template lookup<QString>(kInterfaceOption).value().toInt();
+			const auto choices = std::vector<QString>{
 				tr::lng_settings_interface_original(tr::now),
 				tr::lng_settings_interface_expressive(tr::now),
 				tr::lng_settings_interface_lite(tr::now),
 			};
 			controller->window().show(Box(SingleChoiceBox, SingleChoiceBoxArgs{
 				.title = tr::lng_settings_interface_title(),
-				.options = options,
+				.options = choices,
 				.initialSelection = current,
 				.callback = [](int selection) {
-					base::options::lookup<QString>(kInterfaceOption).set(QString::number(selection));
+					base::options::template lookup<QString>(kInterfaceOption).set(QString::number(selection));
 					PowerSaving::Set(selection == 2
 						? PowerSaving::kAll
 						: PowerSaving::Flags());
@@ -958,7 +958,9 @@ void BuildPerformanceSection(SectionBuilder &builder) {
 		.title = tr::lng_settings_fork_menu(),
 		.st = &st::settingsButtonNoIcon,
 		.onClick = [=] {
-			controller->window().show(Box(Settings::ForkFeaturesBox));
+			controller->window().show(Box(
+				Settings::ForkFeaturesBox,
+				&controller->session()));
 		},
 		.keywords = { u"fork"_q, u"features"_q, u"extras"_q },
 	});
