@@ -917,6 +917,34 @@ void BuildPerformanceSection(SectionBuilder &builder) {
 		.keywords = { u"power"_q, u"saving"_q, u"battery"_q, u"animation"_q },
 	});
 
+	builder.addButton({
+		.id = u"advanced/interface"_q,
+		.title = tr::lng_settings_interface_menu(),
+		.st = &st::settingsButtonNoIcon,
+		.onClick = [=] {
+			const auto current = base::options::lookup<QString>(
+				u"plymegram-interface"_q).value().toInt();
+			const auto options = std::vector<QString>{
+				tr::lng_settings_interface_original(tr::now),
+				tr::lng_settings_interface_expressive(tr::now),
+				tr::lng_settings_interface_lite(tr::now),
+			};
+			controller->window().show(Box(SingleChoiceBox, SingleChoiceBoxArgs{
+				.title = tr::lng_settings_interface_title(),
+				.options = options,
+				.initialSelection = current,
+				.callback = [](int selection) {
+					base::options::lookup<QString>(
+						u"plymegram-interface"_q).set(QString::number(selection));
+					PowerSaving::Set(selection == 2
+						? PowerSaving::kAll
+						: PowerSaving::Flags());
+				},
+			}));
+		},
+		.keywords = { u"interface"_q, u"theme"_q, u"material"_q, u"light"_q },
+	});
+
 	const auto hwAccel = builder.addButton({
 		.id = u"advanced/hw_accel"_q,
 		.title = tr::lng_settings_enable_hwaccel(),

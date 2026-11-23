@@ -371,6 +371,12 @@ void Application::run() {
 		PowerSaving::SetForceAll(saving && !ignore);
 	}, _lifetime);
 
+	const auto interfaceMode = base::options::lookup<QString>(
+		u"plymegram-interface"_q).value().toInt();
+	if (interfaceMode == 2) {
+		PowerSaving::Set(PowerSaving::kAll);
+	}
+
 	style::ShortAnimationPlaying(
 	) | rpl::combine_previous(
 		false
