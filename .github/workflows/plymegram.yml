@@ -113,6 +113,16 @@ jobs:
           cd /d "%TBUILD%\%REPO_NAME%"
           cmake --build out --config Release --target Telegram --parallel %NUMBER_OF_PROCESSORS% -- /p:UseMultiToolTask=true /p:EnforceProcessCountAcrossBuilds=true
 
+      - name: Compress executable (UPX).
+        shell: pwsh
+        run: |
+          try { choco install upx -y | Out-Null } catch {}
+          if (Get-Command upx -ErrorAction SilentlyContinue) {
+            upx --best "%TBUILD%\%REPO_NAME%\out\Release\Plymegram.exe"
+          } else {
+            Write-Host "UPX not available, skipping compression."
+          }
+
       - name: Collect artifact.
         run: |
           mkdir artifact
