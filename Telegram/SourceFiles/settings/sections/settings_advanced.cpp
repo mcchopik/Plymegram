@@ -58,6 +58,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/rp_widget.h"
 #include "ui/screen_reader_mode.h"
 #include "ui/text/format_values.h"
+#include "window/themes/window_theme.h"
 #include "ui/ui_utility.h"
 #include "ui/vertical_list.h"
 #include "ui/widgets/buttons.h"
@@ -939,6 +940,12 @@ void BuildPerformanceSection(SectionBuilder &builder) {
 					PowerSaving::Set(selection == 2
 						? PowerSaving::kAll
 						: PowerSaving::Flags());
+					if (selection == 1) {
+						const auto path = Window::Theme::IsNightMode()
+							? u":/gui/google-dark.tdesktop-theme"_q
+							: u":/gui/google-day.tdesktop-theme"_q;
+						Window::Theme::ToggleNightMode(path);
+					}
 				},
 			}));
 		},
