@@ -44,6 +44,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "settings/sections/settings_chat.h"
 #include "settings/settings_experimental.h"
 #include "settings/settings_power_saving.h"
+#include "settings/settings_fork.h"
 #include "settings/sections/settings_privacy_security.h"
 #include "storage/localstorage.h"
 #include "storage/storage_domain.h"
@@ -950,6 +951,16 @@ void BuildPerformanceSection(SectionBuilder &builder) {
 			}));
 		},
 		.keywords = { u"interface"_q, u"theme"_q, u"material"_q, u"light"_q },
+	});
+
+	builder.addButton({
+		.id = u"advanced/fork_features"_q,
+		.title = tr::lng_settings_fork_menu(),
+		.st = &st::settingsButtonNoIcon,
+		.onClick = [=] {
+			controller->window().show(Box(Settings::ForkFeaturesBox));
+		},
+		.keywords = { u"fork"_q, u"features"_q, u"extras"_q },
 	});
 
 	const auto hwAccel = builder.addButton({

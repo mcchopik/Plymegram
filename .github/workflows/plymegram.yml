@@ -123,10 +123,24 @@ jobs:
             Write-Host "UPX not available, skipping compression."
           }
 
+      - name: Build installer (Inno Setup).
+        shell: pwsh
+        run: |
+          try { choco install innosetup -y | Out-Null } catch {}
+          $iscc = Get-Command iscc -ErrorAction SilentlyContinue
+          if (-not $iscc) {
+            $candidates = @("C:\Program Files (x86)\Inno Setup 6\ISCC.exe", "C:\Program Files\Inno Setup 6\ISCC.exe")
+            foreach ($c in $candidates) { if (Test-Path $c) { $iscc = $c; break } }
+          }
+          if (-not $iscc) { Write-Host "Inno Setup not available, skipping installer."; return }
+          & $iscc "/DMyAppVersion=7.4.5" "/DReleasePath=$env:TBUILD\$env:REPO_NAME\out\Release" "/DSourcePath=$env:TBUILD\$env:REPO_NAME\Telegram\build" "$env:TBUILD\$env:REPO_NAME\Telegram\build\plymegram_setup.iss"
+          if ($LASTEXITCODE -ne 0) { Write-Host "Installer build failed, skipping." }
+
       - name: Collect artifact.
         run: |
           mkdir artifact
           copy "%TBUILD%\%REPO_NAME%\out\Release\Plymegram.exe" artifact\
+          if exist "%TBUILD%\%REPO_NAME%\out\Release\Plymegram-Setup-*.exe" copy "%TBUILD%\%REPO_NAME%\out\Release\Plymegram-Setup-*.exe" artifact\
 
       - name: Report artifact size.
         shell: pwsh
@@ -138,6 +152,8 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: Plymegram-Windows-x64
-          path: artifact\Plymegram.exe
+          path: |
+            artifact\Plymegram.exe
+            artifact\Plymegram-Setup-*.exe
           if-no-files-found: error
           retention-days: 14

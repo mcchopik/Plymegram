@@ -2067,6 +2067,8 @@ PRIVATE
     settings/sections/settings_passkeys.h
     settings/settings_power_saving.cpp
     settings/settings_power_saving.h
+    settings/settings_fork.cpp
+    settings/settings_fork.h
     settings/sections/settings_premium.cpp
     settings/sections/settings_premium.h
     settings/sections/settings_premium_common.h

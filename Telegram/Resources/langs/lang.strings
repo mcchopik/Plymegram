@@ -975,6 +975,13 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_settings_interface_original" = "Original";
 "lng_settings_interface_expressive" = "Material Design 3 Expressive";
 "lng_settings_interface_lite" = "Super Light (low resource)";
+"lng_settings_fork_menu" = "Fork Features";
+"lng_settings_fork_title" = "Plymegram Fork Features";
+"lng_settings_fork_about" = "Extra toggles from community forks, all kept inside this client.";
+"lng_settings_fork_compact" = "Compact chat list";
+"lng_settings_fork_no_autodl" = "Disable media auto-download";
+"lng_settings_fork_static_emoji" = "Static emoji and stickers";
+"lng_settings_fork_show_ids" = "Show numeric IDs in profiles";
 "lng_settings_power_title" = "Power Usage";
 "lng_settings_power_subtitle" = "Power saving options";
 "lng_settings_power_stickers" = "Animated Stickers";
