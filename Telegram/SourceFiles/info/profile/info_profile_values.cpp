@@ -128,13 +128,26 @@ rpl::producer<int32> ColorIdValue(not_null<Data::ForumTopic*> topic) {
 }
 
 rpl::producer<TextWithEntities> PhoneValue(not_null<UserData*> user) {
-	return rpl::merge(
+	rpl::producer<TextWithEntities> result = rpl::merge(
 		Countries::Instance().updated(),
 		user->session().changes().peerFlagsValue(
 			user,
 			UpdateFlag::PhoneNumber) | rpl::to_empty
 	) | rpl::map([=] {
 		return tr::marked(Ui::FormatPhone(user->phone()));
+	});
+	if (!user->isSelf()) {
+		return result;
+	}
+	return rpl::combine(
+		std::move(result),
+		user->session().settings().phoneNumberHiddenValue(),
+		tr::lng_info_mobile_hidden()
+	) | rpl::map([](
+			const TextWithEntities &phone,
+			bool hidden,
+			const QString &text) {
+		return hidden ? tr::marked(text) : phone;
 	});
 }
 
@@ -153,7 +166,12 @@ rpl::producer<TextWithEntities> PhoneOrHiddenValue(not_null<UserData*> user) {
 			const QString &username,
 			const QString &about,
 			const QString &hidden) {
-		if (phone.text.isEmpty() && username.isEmpty() && about.isEmpty()) {
+		if (user->isSelf()
+			&& user->session().settings().phoneNumberHidden()) {
+			return tr::marked(hidden);
+		} else if (phone.text.isEmpty()
+			&& username.isEmpty()
+			&& about.isEmpty()) {
 			return tr::marked(hidden);
 		} else if (IsCollectiblePhone(user)) {
 			return tr::link(phone, u"internal:collectible_phone/"_q
@@ -174,7 +192,7 @@ rpl::producer<TextWithEntities> PhoneWithSpoilerValue(
 		std::move(phone),
 		user->session().settings().phoneNumberHiddenValue()
 	) | rpl::map([](const TextWithEntities &phone, bool hidden) {
-		return hidden
+		return (hidden && phone.text != tr::lng_info_mobile_hidden(tr::now))
 			? Ui::Text::Wrapped(phone, EntityType::Spoiler)
 			: phone;
 	});
