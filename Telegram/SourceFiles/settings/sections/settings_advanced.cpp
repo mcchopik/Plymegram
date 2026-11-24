@@ -12,6 +12,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "api/api_global_privacy.h"
 #include "apiwrap.h"
 #include "base/call_delayed.h"
+#include "base/options.h"
 #include "base/platform/base_platform_custom_app_icon.h"
 #include "base/platform/base_platform_info.h"
 #include "base/screen_reader_state.h"
