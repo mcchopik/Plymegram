@@ -7,6 +7,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "info/profile/info_profile_phone_menu.h"
 
+#include "base/options.h"
 #include "data/data_user.h"
 #include "info/profile/info_profile_values.h"
 #include "lang/lang_keys.h"
@@ -118,6 +119,10 @@ int TextItem::contentHeight() const {
 	return _label->height();
 }
 
+[[nodiscard]] bool HidePhoneFully() {
+	return base::options::lookup<bool>("plymegram-hide-phone").value();
+}
+
 } // namespace
 
 bool IsCollectiblePhone(not_null<UserData*> user) {
@@ -153,7 +158,7 @@ void AddPhoneMenu(not_null<Ui::PopupMenu*> menu, not_null<UserData*> user) {
 void AddPhoneSpoilerMenu(
 		not_null<Ui::PopupMenu*> menu,
 		not_null<UserData*> user) {
-	if (!user->isSelf()) {
+	if (!user->isSelf() || HidePhoneFully()) {
 		return;
 	}
 	const auto session = &user->session();
@@ -169,6 +174,9 @@ void AddPhoneSpoilerMenu(
 }
 
 void TogglePhoneSpoiler(not_null<UserData*> user) {
+	if (HidePhoneFully()) {
+		return;
+	}
 	auto &settings = user->session().settings();
 	settings.setPhoneNumberHidden(!settings.phoneNumberHidden());
 	user->session().saveSettingsDelayed();
@@ -187,7 +195,7 @@ void SetupPhoneSpoilerClick(
 		not_null<Ui::FlatLabel*> label,
 		not_null<UserData*> user,
 		Fn<void()> copied) {
-	if (!user->isSelf()) {
+	if (!user->isSelf() || HidePhoneFully()) {
 		return;
 	}
 	const auto press = label->lifetime().make_state<QPoint>();
