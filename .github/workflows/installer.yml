@@ -29,8 +29,8 @@ jobs:
         run: |
           $runId = '${{ inputs.run_id }}'
           if (-not $runId) {
-            $runs = gh api repos/${{ github.repository }}/actions/artifacts --jq '.artifacts[] | select(.name=="Plymegram-Windows-x64") | .workflow_runs[0].id' 2>$null
-            $runId = ($runs | Select-Object -First 1)
+            $artifact = gh api repos/${{ github.repository }}/actions/artifacts/14716513724 2>$null | ConvertFrom-Json
+            $runId = $artifact.workflow_run.id
           }
           if (-not $runId) { throw 'No artifact run found' }
           Write-Host "Using run $runId"
