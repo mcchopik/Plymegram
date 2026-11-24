@@ -59,6 +59,6 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: Plymegram-Installer
-          path: Plymegram/Telegram/build/Plymegram-Setup-*.exe
+          path: exe/Plymegram-Setup-*.exe
           if-no-files-found: error
           retention-days: 30
