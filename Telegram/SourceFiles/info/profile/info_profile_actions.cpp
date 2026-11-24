@@ -28,6 +28,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "boxes/peers/verify_peers_box.h"
 #include "boxes/report_messages_box.h"
 #include "boxes/share_box.h"
+#include "ui/image/image_location.h"
 #include "boxes/star_gift_box.h"
 #include "boxes/translate_box.h"
 #include "core/application.h"
@@ -147,6 +148,14 @@ base::options::toggle ShowPeerIdBelowAbout({
 		" Add contact IDs to exported data.",
 });
 
+const char kOptionShowDcBelowAbout[] = "show-dc-below-about";
+
+base::options::toggle ShowDcBelowAbout({
+	.id = kOptionShowDcBelowAbout,
+	.name = "Show data center in Profile",
+	.description = "Show the data center ID below the Bio / Description.",
+});
+
 base::options::toggle ShowChannelJoinedBelowAbout({
 	.id = kOptionShowChannelJoinedBelowAbout,
 	.name = "Show Channel Joined Date in Profile",
@@ -245,6 +254,14 @@ base::options::toggle ShowChannelJoinedBelowAbout({
 			value.append(Link(
 				Italic(Lang::FormatCountDecimal(raw)),
 				kPeerIdLinkIndex));
+		}
+		if (ShowDcBelowAbout.value()) {
+			using namespace Ui::Text;
+			if (!value.empty()) {
+				value.append("\n");
+			}
+			const auto dc = peer->userpicLocation().dcId();
+			value.append(Italic(u"dc: "_q + QString::number(dc)));
 		}
 		if (ShowChannelJoinedBelowAbout.value()) {
 			if (const auto channel = peer->asChannel()) {

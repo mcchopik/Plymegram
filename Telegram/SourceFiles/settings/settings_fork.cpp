@@ -10,6 +10,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/options.h"
 #include "data/data_auto_download.h"
 #include "data/data_session.h"
+#include "info/profile/info_profile_actions.h"
 #include "lang/lang_keys.h"
 #include "main/main_session.h"
 #include "main/main_session_settings.h"
@@ -103,6 +104,7 @@ void ForkFeaturesBox(
 			: (PowerSaving::Current() & ~flags));
 	});
 	AddToggle(container, tr::lng_settings_fork_show_ids(), kShowIds);
+	AddToggle(container, tr::lng_settings_fork_show_dc(), Info::Profile::kOptionShowDcBelowAbout);
 	Ui::AddDividerText(container, tr::lng_settings_fork_privacy());
 	AddToggle(container, tr::lng_settings_fork_no_read(), "plymegram-no-read-metrics");
 	AddToggle(container, tr::lng_settings_fork_no_promo(), "plymegram-no-promo-telemetry");
