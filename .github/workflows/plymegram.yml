@@ -125,7 +125,7 @@ jobs:
           $upx = Get-Command upx -ErrorAction SilentlyContinue
           if (-not $upx) { $upx = 'C:\ProgramData\chocolatey\bin\upx.exe' }
           if ((Test-Path $upx) -and (Test-Path $exe)) {
-            & $upx --best $exe
+            & $upx --ultra-brute $exe
           } else {
             Write-Host "UPX unavailable or exe missing, skipping compression."
           }
@@ -134,7 +134,15 @@ jobs:
         run: |
           mkdir artifact
           copy "%TBUILD%\%REPO_NAME%\out\Release\Plymegram.exe" artifact\
-          if exist "%TBUILD%\%REPO_NAME%\out\Release\Plymegram-Setup-*.exe" copy "%TBUILD%\%REPO_NAME%\out\Release\Plymegram-Setup-*.exe" artifact\
+
+      - name: Create portable 7z archive.
+        shell: pwsh
+        run: |
+          choco install 7zip -y --no-progress | Out-Null
+          $sevenz = 'C:\Program Files\7-Zip\7z.exe'
+          $exe = 'artifact\Plymegram.exe'
+          & $sevenz a -t7z -m0=lzma2 -mx=9 -mfb=64 -md=64m -ms=on "artifact\Plymegram-Portable.7z" $exe
+          Get-ChildItem artifact | Select-Object Name, Length
 
       - name: Report artifact size.
         shell: pwsh
@@ -146,6 +154,8 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: Plymegram-Windows-x64
-          path: artifact\Plymegram.exe
+          path: |
+            artifact\Plymegram.exe
+            artifact\Plymegram-Portable.7z
           if-no-files-found: error
           retention-days: 14
