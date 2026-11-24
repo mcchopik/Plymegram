@@ -120,11 +120,14 @@ jobs:
       - name: Compress executable (UPX).
         shell: pwsh
         run: |
+          $exe = Join-Path $env:GITHUB_WORKSPACE 'TBuild\Plymegram\out\Release\Plymegram.exe'
           try { choco install upx -y | Out-Null } catch {}
-          if (Get-Command upx -ErrorAction SilentlyContinue) {
-            upx --best "%TBUILD%\%REPO_NAME%\out\Release\Plymegram.exe"
+          $upx = Get-Command upx -ErrorAction SilentlyContinue
+          if (-not $upx) { $upx = 'C:\ProgramData\chocolatey\bin\upx.exe' }
+          if ((Test-Path $upx) -and (Test-Path $exe)) {
+            & $upx --best $exe
           } else {
-            Write-Host "UPX not available, skipping compression."
+            Write-Host "UPX unavailable or exe missing, skipping compression."
           }
 
       - name: Build installer (Inno Setup).
