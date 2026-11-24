@@ -157,24 +157,28 @@ base::options::toggle PlymegramNoReadMetrics({
 	.id = "plymegram-no-read-metrics",
 	.name = "Disable read metrics",
 	.description = "Don't report per-message read timing to the service.",
+	.defaultValue = true,
 });
 
 base::options::toggle PlymegramNoPromoTelemetry({
 	.id = "plymegram-no-promo-telemetry",
 	.name = "Disable promo telemetry",
 	.description = "Don't report premium promo screen events.",
+	.defaultValue = true,
 });
 
 base::options::toggle PlymegramNoSponsoredView({
 	.id = "plymegram-no-sponsored-view",
 	.name = "Disable sponsored message views",
 	.description = "Don't report sponsored message views and clicks.",
+	.defaultValue = true,
 });
 
 base::options::toggle PlymegramNoMusicListen({
 	.id = "plymegram-no-music-listen",
 	.name = "Disable music listen reports",
 	.description = "Don't report music listening duration.",
+	.defaultValue = true,
 });
 
 base::options::toggle OptionSkipUrlSchemeRegister({
