@@ -87,10 +87,52 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include <ksandbox.h>
 
+#include <QtCore/QFile>
+#include <QtCore/QJsonDocument>
+
 namespace Settings {
 namespace {
 
 constexpr auto kInterfaceOption = "plymegram-interface";
+
+const auto kSettingsBackupPrefix = u"tdesktop-flags:"_q;
+constexpr auto kSettingsBackupMaxCompressed = 1024 * 1024;
+constexpr auto kSettingsBackupMaxDecoded = 8 * 1024 * 1024;
+
+[[nodiscard]] QString EncodeSettingsBackup(const QString &json) {
+	const auto flags = QByteArray::Base64UrlEncoding
+		| QByteArray::OmitTrailingEquals;
+	return kSettingsBackupPrefix
+		+ QString::fromLatin1(qCompress(json.toLatin1(), 9).toBase64(flags));
+}
+
+[[nodiscard]] QString DecodeSettingsBackup(const QString &text) {
+	if (!text.startsWith(kSettingsBackupPrefix)) {
+		return QString();
+	}
+	auto encoded = QStringView(text).mid(
+		kSettingsBackupPrefix.size()).toLatin1();
+	if (encoded.size() > kSettingsBackupMaxCompressed) {
+		return QString();
+	}
+	const auto compressed = QByteArray::fromBase64Encoding(
+		std::move(encoded),
+		QByteArray::Base64UrlEncoding
+			| QByteArray::AbortOnBase64DecodingErrors);
+	if (!compressed || compressed->isEmpty()) {
+		return QString();
+	}
+	const auto decoded = qUncompress(*compressed);
+	if (decoded.isEmpty() || decoded.size() > kSettingsBackupMaxDecoded) {
+		return QString();
+	}
+	auto error = QJsonParseError();
+	const auto parsed = QJsonDocument::fromJson(decoded, &error);
+	if ((error.error != QJsonParseError::NoError) || !parsed.isObject()) {
+		return QString();
+	}
+	return QString::fromUtf8(decoded);
+}
 
 int InterfaceMode() {
 	return base::options::lookup<QString>(kInterfaceOption).value().toInt();
@@ -1351,6 +1393,89 @@ void BuildExportSection(SectionBuilder &builder) {
 				[=] { Core::App().exportManager().start(session); });
 		},
 		.keywords = { u"export"_q, u"data"_q, u"backup"_q },
+	});
+
+	builder.addButton({
+		.id = u"advanced/backup_settings_export"_q,
+		.title = u"Backup settings"_q,
+		.icon = { &st::menuIconExport },
+		.onClick = [=] {
+			const auto weak = base::make_weak(controller);
+			FileDialog::GetWritePath(
+				Core::App().getFileDialogParent(),
+				u"Export settings backup"_q,
+				u"Plymegram settings backup (*.txt)"_q,
+				filedialogDefaultName(u"plymegram-settings"_q, u".txt"_q),
+				[=](QString &&path) {
+					if (path.isEmpty()) {
+						return;
+					}
+					QFile file(path);
+					const auto content = EncodeSettingsBackup(
+						base::options::serialize()).toUtf8();
+					if (!file.open(QIODevice::WriteOnly)
+						|| file.write(content) != content.size()) {
+						if (weak) {
+							weak->window().showToast(
+								u"Couldn't save the settings backup."_q);
+						}
+						return;
+					}
+					file.close();
+					if (weak) {
+						weak->window().showToast(
+							u"Settings backup saved."_q);
+					}
+				});
+		},
+		.keywords = { u"backup"_q, u"settings"_q, u"export"_q },
+	});
+
+	builder.addButton({
+		.id = u"advanced/backup_settings_import"_q,
+		.title = u"Import settings backup"_q,
+		.icon = { &st::menuIconImportTheme },
+		.onClick = [=] {
+			const auto weak = base::make_weak(controller);
+			FileDialog::GetOpenPath(
+				Core::App().getFileDialogParent(),
+				u"Import settings backup"_q,
+				u"Plymegram settings backup (*.txt);;"_q
+					+ FileDialog::AllFilesFilter(),
+				[=](FileDialog::OpenResult &&result) {
+					if (result.paths.isEmpty()) {
+						return;
+					}
+					QFile file(result.paths.front());
+					if (!file.open(QIODevice::ReadOnly)) {
+						if (weak) {
+							weak->window().showToast(
+								u"Couldn't read the settings backup."_q);
+						}
+						return;
+					}
+					const auto json = DecodeSettingsBackup(
+						QString::fromUtf8(file.readAll()));
+					file.close();
+					if (json.isEmpty()
+						|| !base::options::deserialize(json)) {
+						if (weak) {
+							weak->window().showToast(
+								u"This is not a valid settings backup."_q);
+						}
+						return;
+					}
+					Local::writeSettings();
+					if (weak) {
+						weak->window().show(Ui::MakeConfirmBox({
+							.text = u"Settings imported. Restart to apply all changes."_q,
+							.confirmed = [] { Core::Restart(); },
+							.confirmText = tr::lng_settings_restart_now(),
+						}));
+					}
+				});
+		},
+		.keywords = { u"backup"_q, u"settings"_q, u"import"_q },
 	});
 
 	builder.addButton({
