@@ -181,6 +181,13 @@ base::options::toggle PlymegramNoMusicListen({
 	.defaultValue = true,
 });
 
+base::options::toggle PlymegramHidePhone({
+	.id = "plymegram-hide-phone",
+	.name = "Hide phone number in profile",
+	.description = "Hide your phone number from other users in profile.",
+	.defaultValue = true,
+});
+
 base::options::toggle OptionSkipUrlSchemeRegister({
 	.id = kOptionSkipUrlSchemeRegister,
 	.name = "Skip URL scheme register",

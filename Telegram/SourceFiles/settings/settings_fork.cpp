@@ -108,6 +108,10 @@ void ForkFeaturesBox(
 	AddToggle(container, tr::lng_settings_fork_no_promo(), "plymegram-no-promo-telemetry");
 	AddToggle(container, tr::lng_settings_fork_no_sponsored(), "plymegram-no-sponsored-view");
 	AddToggle(container, tr::lng_settings_fork_no_music(), "plymegram-no-music-listen");
+	AddToggle(container, tr::lng_settings_fork_hide_phone(), "plymegram-hide-phone", [=](bool value) {
+		session->settings().setPhoneNumberHidden(value);
+		session->saveSettingsDelayed();
+	});
 }
 
 } // namespace Settings

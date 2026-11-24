@@ -988,6 +988,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_settings_fork_no_promo" = "Don't report promo screen events";
 "lng_settings_fork_no_sponsored" = "Don't report sponsored views/clicks";
 "lng_settings_fork_no_music" = "Don't report music listening";
+"lng_settings_fork_hide_phone" = "Hide phone number in profile";
 "lng_settings_power_title" = "Power Usage";
 "lng_settings_power_subtitle" = "Power saving options";
 "lng_settings_power_stickers" = "Animated Stickers";
