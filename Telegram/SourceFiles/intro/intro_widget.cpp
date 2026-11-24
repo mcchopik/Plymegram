@@ -111,8 +111,8 @@ Widget::Widget(
 	switch (point) {
 	case EnterPoint::Start:
 		getNearestDC();
-		appendStep(new ThemeWidget(this, _account, getData()));
 		appendStep(new StartWidget(this, _account, getData()));
+		appendStep(new ThemeWidget(this, _account, getData()));
 		break;
 	case EnterPoint::Phone:
 		appendStep(new PhoneWidget(this, _account, getData()));
