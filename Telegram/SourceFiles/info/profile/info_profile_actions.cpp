@@ -256,12 +256,17 @@ base::options::toggle ShowChannelJoinedBelowAbout({
 				kPeerIdLinkIndex));
 		}
 		if (ShowDcBelowAbout.value()) {
-			using namespace Ui::Text;
-			if (!value.empty()) {
-				value.append("\n");
+			const auto location = peer->userpicLocation();
+			const auto stored = std::get_if<StorageFileLocation>(
+				&location.file().data);
+			if (stored && stored->valid()) {
+				using namespace Ui::Text;
+				if (!value.empty()) {
+					value.append("\n");
+				}
+				value.append(Italic(
+					u"dc: "_q + QString::number(stored->dcId())));
 			}
-			const auto dc = peer->userpicLocation().dcId();
-			value.append(Italic(u"dc: "_q + QString::number(dc)));
 		}
 		if (ShowChannelJoinedBelowAbout.value()) {
 			if (const auto channel = peer->asChannel()) {
