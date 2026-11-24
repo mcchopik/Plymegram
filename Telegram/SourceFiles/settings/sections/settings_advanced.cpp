@@ -1465,6 +1465,10 @@ void BuildExportSection(SectionBuilder &builder) {
 						}
 						return;
 					}
+					session->settings().setPhoneNumberHidden(
+						base::options::lookup<bool>(
+							"plymegram-hide-phone").value());
+					session->saveSettingsDelayed();
 					Local::writeSettings();
 					if (weak) {
 						weak->window().show(Ui::MakeConfirmBox({
