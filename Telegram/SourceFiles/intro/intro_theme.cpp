@@ -53,11 +53,10 @@ void ThemeWidget::selectDark() {
 }
 
 void ThemeWidget::submit() {
-	if (_darkSelected) {
-		Window::Theme::ToggleNightMode();
-	} else {
-		Window::Theme::SetNightModeValue(false);
-	}
+	const auto path = _darkSelected
+		? u":/gui/night.tdesktop-theme"_q
+		: u":/gui/day-blue.tdesktop-theme"_q;
+	Window::Theme::ApplyDefaultWithPath(path);
 	Window::Theme::KeepApplied();
 	goNext<QrWidget>();
 }

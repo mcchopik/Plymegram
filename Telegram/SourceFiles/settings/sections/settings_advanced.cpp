@@ -958,9 +958,6 @@ void BuildPerformanceSection(SectionBuilder &builder) {
 								: u"-day.tdesktop-theme"_q);
 						Window::Theme::ApplyDefaultWithPath(path);
 						Window::Theme::KeepApplied();
-					} else {
-						Window::Theme::ApplyDefaultWithPath(QString());
-						Window::Theme::KeepApplied();
 					}
 				},
 			}));

@@ -629,6 +629,7 @@ void Application::startSettingsAndBackground() {
 		} else {
 			Window::Theme::ApplyDefaultWithPath(QString());
 		}
+		Window::Theme::KeepApplied();
 	}
 	checkSystemDarkMode();
 	Ui::SetScreenReaderModeDisabled(

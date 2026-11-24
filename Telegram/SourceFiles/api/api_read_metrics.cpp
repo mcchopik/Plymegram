@@ -34,6 +34,10 @@ void ReadMetrics::add(
 
 void ReadMetrics::send() {
 	for (auto i = _pending.begin(); i != _pending.end();) {
+		if (base::options::lookup<bool>("plymegram-no-read-metrics").value()) {
+			i = _pending.erase(i);
+			continue;
+		}
 		if (_requests.contains(i->first)) {
 			++i;
 			continue;
@@ -49,10 +53,6 @@ void ReadMetrics::send() {
 				MTP_int(m.activeTimeInViewMs),
 				MTP_int(m.heightToViewportRatioPermille),
 				MTP_int(m.seenRangeRatioPermille)));
-		}
-		if (base::options::lookup<bool>("plymegram-no-read-metrics").value()) {
-			i = _pending.erase(i);
-			continue;
 		}
 		const auto peer = i->first;
 		const auto finish = [=] {
