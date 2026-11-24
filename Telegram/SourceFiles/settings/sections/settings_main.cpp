@@ -883,7 +883,10 @@ void SetupValidatePhoneNumberSuggestion(
 		tr::lng_settings_suggestion_phone_number_title(
 			lt_phone,
 			rpl::single(
-				Ui::FormatPhone(controller->session().user()->phone()))),
+				controller->session().settings().phoneNumberHidden()
+					? tr::lng_info_mobile_hidden(tr::now)
+					: Ui::FormatPhone(
+						controller->session().user()->phone()))),
 		QMargins(
 			st::boxRowPadding.left()
 				- st::defaultSubsectionTitlePadding.left(),
