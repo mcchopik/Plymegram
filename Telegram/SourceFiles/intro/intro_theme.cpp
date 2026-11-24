@@ -39,7 +39,7 @@ void ThemeWidget::resizeEvent(QResizeEvent *e) {
 	const auto x = contentLeft();
 	const auto y = contentTop() + st::introDescriptionTop + st::introLinkTop;
 	_light->moveToLeft(x, y);
-	_dark->moveToLeft(x, y + _light->height() + st::introSkip);
+	_dark->moveToLeft(x, y + _light->height() + st::introLinkTop);
 }
 
 void ThemeWidget::selectLight() {
