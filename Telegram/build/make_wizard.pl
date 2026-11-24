@@ -7,7 +7,7 @@ sub write_bmp {
     my $pixels = $row * $h;
     my $off = 54;
     my $size = $off + $pixels;
-    my $bmp = pack('a2Vx x x V', 'BM', $size, $off);
+    my $bmp = pack('a2VVV', 'BM', $size, 0, $off);
     $bmp .= pack('V', 40); # DIB size
     $bmp .= pack('l<l<', $w, $h);
     $bmp .= pack('vv', 1, 24);
@@ -24,18 +24,29 @@ sub write_bmp {
         for my $x (0 .. $w - 1) {
             my ($r, $g, $b);
             if ($dark) {
-                # dark glass: deep navy/purple radial gradient with subtle neon glow
+                # black neon liquid glass: deep black with cold neon reflections
                 my $dx = ($x - $w / 2) / ($w / 2);
                 my $dy = ($y - $h / 2) / ($h / 2);
                 my $d = sqrt($dx * $dx + $dy * $dy);
                 my $glow = 1 - $d;
                 $glow = 0 if $glow < 0;
-                $r = int(12 + 40 * $glow * $glow);
-                $g = int(10 + 20 * $glow * $glow);
-                $b = int(28 + 70 * $glow * $glow);
-                # neon rim
-                if ($d > 0.92 && $d < 0.99) {
-                    $r = 90; $g = 60; $b = 180;
+                # near-black base with faint blue-violet liquid sheen
+                $r = int(6 + 16 * $glow * $glow);
+                $g = int(7 + 20 * $glow * $glow);
+                $b = int(12 + 38 * $glow * $glow);
+                # diagonal liquid-glass highlight
+                my $sheen = ($dx * -0.6 + $dy * -0.8);
+                if ($sheen > 0.45) {
+                    $r += int(18 * ($sheen - 0.45));
+                    $g += int(26 * ($sheen - 0.45));
+                    $b += int(55 * ($sheen - 0.45));
+                }
+                # neon rim (cyan-magenta)
+                if ($d > 0.90 && $d < 0.99) {
+                    $r = 40; $g = 200; $b = 230;
+                }
+                if ($d > 0.80 && $d <= 0.90) {
+                    $r = 150; $g = 50; $b = 220;
                 }
             } else {
                 my $dx = ($x - $w / 2) / ($w / 2);
