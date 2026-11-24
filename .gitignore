@@ -74,3 +74,7 @@ settings.local.json
 
 # Generated changelog page (built by CI, deployed to GitHub Pages)
 /docs/changelog/
+
+# Local agent docs (not for GitHub)
+/PLAN.md
+/AGENTS_BUS.md
