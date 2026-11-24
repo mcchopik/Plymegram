@@ -8,19 +8,27 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "settings/settings_fork.h"
 
 #include "base/options.h"
+#include "core/application.h"
 #include "data/data_auto_download.h"
 #include "data/data_session.h"
 #include "info/profile/info_profile_actions.h"
 #include "lang/lang_keys.h"
 #include "main/main_session.h"
 #include "main/main_session_settings.h"
+#include "settings/settings_common.h"
+#include "storage/localstorage.h"
+#include "ui/boxes/choose_font_box.h"
 #include "ui/power_saving.h"
+#include "ui/style/style_core_font.h"
 #include "ui/vertical_list.h"
 #include "ui/widgets/buttons.h"
 #include "styles/style_layers.h"
 #include "styles/style_settings.h"
 
 #include <cstring>
+
+#include <QtGui/QColor>
+#include <QtGui/QImage>
 
 namespace Settings {
 namespace {
@@ -105,6 +113,41 @@ void ForkFeaturesBox(
 	});
 	AddToggle(container, tr::lng_settings_fork_show_ids(), kShowIds);
 	AddToggle(container, tr::lng_settings_fork_show_dc(), Info::Profile::kOptionShowDcBelowAbout);
+
+	const auto settings = &Core::App().settings();
+	const auto family = container->lifetime().make_state<
+		rpl::variable<QString>
+	>(settings->customFontFamily());
+	const auto fontLabel = family->value() | rpl::map([](QString value) {
+		return value.isEmpty()
+			? tr::lng_font_default(tr::now)
+			: (value == style::SystemFontTag())
+			? tr::lng_font_system(tr::now)
+			: value;
+	});
+	const auto fontButton = AddButtonWithLabel(
+		container,
+		rpl::single(u"Custom font"_q),
+		fontLabel,
+		st::settingsButtonNoIcon);
+	fontButton->setClickedCallback([=] {
+		const auto save = [=](QString chosen) {
+			*family = chosen;
+			settings->setCustomFontFamily(chosen);
+			Local::writeSettings();
+			Core::Restart();
+		};
+		const auto generateBg = [] {
+			auto image = QImage(
+				QSize(st::boxWidth, st::boxWidth),
+				QImage::Format_ARGB32_Premultiplied);
+			image.fill(QColor(235, 235, 235));
+			return image;
+		};
+		box->getDelegate()->show(Box(
+			Ui::ChooseFontBox, generateBg, family->current(), save));
+	});
+
 	Ui::AddDividerText(container, tr::lng_settings_fork_privacy());
 	AddToggle(container, tr::lng_settings_fork_no_read(), "plymegram-no-read-metrics");
 	AddToggle(container, tr::lng_settings_fork_no_promo(), "plymegram-no-promo-telemetry");
