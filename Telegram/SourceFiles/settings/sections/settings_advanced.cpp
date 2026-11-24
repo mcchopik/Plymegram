@@ -1489,8 +1489,12 @@ void BuildExportSection(SectionBuilder &builder) {
 		.onClick = [=] {
 			controller->show(Ui::MakeConfirmBox({
 				.text = u"Reset all Plymegram options to their defaults? Chats and account data are not affected."_q,
-				.confirmed = [] {
+				.confirmed = [=] {
 					base::options::reset();
+					session->settings().setPhoneNumberHidden(
+						base::options::lookup<bool>(
+							"plymegram-hide-phone").value());
+					session->saveSettingsDelayed();
 					Local::writeSettings();
 					Core::Restart();
 				},
