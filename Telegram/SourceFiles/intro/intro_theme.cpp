@@ -36,10 +36,10 @@ ThemeWidget::ThemeWidget(
 
 void ThemeWidget::resizeEvent(QResizeEvent *e) {
 	Step::resizeEvent(e);
-	const auto x = contentLeft();
-	const auto y = contentTop() + st::introDescriptionTop + st::introLinkTop;
+	const auto x = contentLeft() + st::buttonRadius;
+	const auto y = errorTop() + st::introLinkTop;
 	_light->moveToLeft(x, y);
-	_dark->moveToLeft(x, y + _light->height() + st::introLinkTop);
+	_dark->moveToLeft(x + _light->width() + st::introLinkTop, y);
 }
 
 void ThemeWidget::selectLight() {
