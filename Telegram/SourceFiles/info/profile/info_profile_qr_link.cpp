@@ -16,6 +16,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "info/profile/info_profile_values.h"
 #include "lang/lang_keys.h"
 #include "main/main_session.h"
+#include "main/main_session_settings.h"
 #include "mtproto/sender.h"
 
 #include <QtCore/QDateTime>
@@ -116,6 +117,9 @@ void OwnQrLinkState::start() {
 		_phoneLabel = phone.text;
 		refresh();
 	}, _lifetime);
+	_session->settings().phoneNumberHiddenValue() | rpl::on_next([=](bool) {
+		refresh();
+	}, _lifetime);
 	auto &privacy = _session->api().userPrivacy();
 	privacy.value(Privacy::Key::PhoneNumber) | rpl::on_next([=](
 			const Privacy::Rule &rule) {
@@ -149,6 +153,7 @@ void OwnQrLinkState::refresh() {
 	} else if (_phonePrivacy
 		&& _addedPrivacy
 		&& !_self->phone().isEmpty()
+		&& !_session->settings().phoneNumberHidden()
 		&& !(*_phonePrivacy == Privacy::Option::Nobody
 			&& *_addedPrivacy != Privacy::Option::Everyone)) {
 		leaveContact();
