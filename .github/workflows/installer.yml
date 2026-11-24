@@ -1,0 +1,62 @@
+name: Plymegram Installer (from artifact)
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Run ID with Plymegram-Windows-x64 artifact'
+        required: false
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  installer:
+    name: Build installer from ready exe
+    runs-on: windows-latest
+    steps:
+      - name: Checkout.
+        uses: actions/checkout@v7
+        with:
+          path: Plymegram
+
+      - name: Download ready exe.
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $runId = '${{ inputs.run_id }}'
+          if (-not $runId) {
+            $runs = gh api repos/${{ github.repository }}/actions/artifacts --jq '.artifacts[] | select(.name=="Plymegram-Windows-x64") | .workflow_runs[0].id' 2>$null
+            $runId = ($runs | Select-Object -First 1)
+          }
+          if (-not $runId) { throw 'No artifact run found' }
+          Write-Host "Using run $runId"
+          gh run download $runId -n Plymegram-Windows-x64 -D exe 2>&1
+          Get-ChildItem -Recurse exe | Select-Object FullName, Length
+
+      - name: Install Inno Setup.
+        shell: pwsh
+        run: |
+          choco install innosetup -y --no-progress
+          if (-not (Test-Path 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe')) { throw 'Inno Setup not installed' }
+
+      - name: Build installer.
+        shell: pwsh
+        run: |
+          $iscc = 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
+          $exe = Get-ChildItem -Recurse -Filter 'Plymegram.exe' -Path exe | Select-Object -First 1
+          if (-not $exe) { throw 'Plymegram.exe not found in artifact' }
+          $release = $exe.Directory.FullName
+          & $iscc "/DMyAppVersion=7.4.5" "/DReleasePath=$release" "/DSourcePath=$((Resolve-Path 'Plymegram\Telegram\build').Path)" "$((Resolve-Path 'Plymegram\Telegram\build\plymegram_setup.iss').Path)"
+          if ($LASTEXITCODE -ne 0) { throw 'ISCC failed' }
+
+      - name: Upload installer.
+        uses: actions/upload-artifact@v7
+        with:
+          name: Plymegram-Installer
+          path: Plymegram/Telegram/build/Plymegram-Setup-*.exe
+          if-no-files-found: error
+          retention-days: 30
