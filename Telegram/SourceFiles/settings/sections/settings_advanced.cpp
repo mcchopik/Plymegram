@@ -1479,6 +1479,24 @@ void BuildExportSection(SectionBuilder &builder) {
 	});
 
 	builder.addButton({
+		.id = u"advanced/reset_settings"_q,
+		.title = tr::lng_settings_experimental_restore(),
+		.icon = { &st::menuIconRemove },
+		.onClick = [=] {
+			controller->show(Ui::MakeConfirmBox({
+				.text = u"Reset all Plymegram options to their defaults? Chats and account data are not affected."_q,
+				.confirmed = [] {
+					base::options::reset();
+					Local::writeSettings();
+					Core::Restart();
+				},
+				.confirmText = tr::lng_settings_experimental_restore(),
+			}));
+		},
+		.keywords = { u"reset"_q, u"defaults"_q, u"settings"_q },
+	});
+
+	builder.addButton({
 		.id = u"advanced/experimental"_q,
 		.title = tr::lng_settings_experimental(),
 		.icon = { &st::menuIconExperimental },
