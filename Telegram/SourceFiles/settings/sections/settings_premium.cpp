@@ -61,6 +61,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "window/window_session_controller_link_info.h"
 #include "base/unixtime.h"
 #include "apiwrap.h"
+#include "base/options.h"
 #include "api/api_premium.h"
 #include "styles/style_chat_helpers.h"
 #include "styles/style_menu_icons.h"
@@ -500,6 +501,9 @@ void SendAppLog(
 		not_null<::Main::Session*> session,
 		const QString &type,
 		const MTPJSONValue &data) {
+	if (base::options::lookup<bool>("plymegram-no-promo-telemetry").value()) {
+		return;
+	}
 	const auto now = double(base::unixtime::now())
 		+ (QTime::currentTime().msec() / 1000.);
 	session->api().request(MTPhelp_SaveAppLog(

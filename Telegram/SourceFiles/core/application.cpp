@@ -147,6 +147,36 @@ void SetCrashAnnotationsGL() {
 
 constexpr auto kInterfaceOption = "plymegram-interface";
 
+base::options::option<QString> PlymegramInterfaceMode({
+	.id = kInterfaceOption,
+	.name = "Interface mode",
+	.description = "Plymegram interface preset: 0 original, 1 expressive, 2 lite, 3 HyperOS.",
+});
+
+base::options::toggle PlymegramNoReadMetrics({
+	.id = "plymegram-no-read-metrics",
+	.name = "Disable read metrics",
+	.description = "Don't report per-message read timing to the service.",
+});
+
+base::options::toggle PlymegramNoPromoTelemetry({
+	.id = "plymegram-no-promo-telemetry",
+	.name = "Disable promo telemetry",
+	.description = "Don't report premium promo screen events.",
+});
+
+base::options::toggle PlymegramNoSponsoredView({
+	.id = "plymegram-no-sponsored-view",
+	.name = "Disable sponsored message views",
+	.description = "Don't report sponsored message views and clicks.",
+});
+
+base::options::toggle PlymegramNoMusicListen({
+	.id = "plymegram-no-music-listen",
+	.name = "Disable music listen reports",
+	.description = "Don't report music listening duration.",
+});
+
 base::options::toggle OptionSkipUrlSchemeRegister({
 	.id = kOptionSkipUrlSchemeRegister,
 	.name = "Skip URL scheme register",
@@ -376,15 +406,6 @@ void Application::run() {
 	const auto interfaceMode = base::options::lookup<QString>(kInterfaceOption).value().toInt();
 	if (interfaceMode == 2) {
 		PowerSaving::Set(PowerSaving::kAll);
-	} else if (interfaceMode == 1 || interfaceMode == 3) {
-		const auto prefix = interfaceMode == 3
-			? u"hyperos"_q
-			: u"m3expressive"_q;
-		const auto path = u":/gui/"_q + prefix
-			+ (Window::Theme::IsNightMode()
-				? u"-dark.tdesktop-theme"_q
-				: u"-day.tdesktop-theme"_q);
-		Window::Theme::ToggleNightMode(path);
 	}
 
 	style::ShortAnimationPlaying(
@@ -583,6 +604,21 @@ void Application::startSettingsAndBackground() {
 	Local::rewriteSettingsIfNeeded();
 	Window::Theme::Background()->start();
 	Local::ApplyDefaultNightMode();
+	{
+		const auto mode = base::options::lookup<QString>(kInterfaceOption).value().toInt();
+		if (mode == 1 || mode == 3) {
+			const auto prefix = mode == 3
+				? u"hyperos"_q
+				: u"m3expressive"_q;
+			const auto path = u":/gui/"_q + prefix
+				+ (Window::Theme::IsNightMode()
+					? u"-dark.tdesktop-theme"_q
+					: u"-day.tdesktop-theme"_q);
+			Window::Theme::ApplyDefaultWithPath(path);
+		} else {
+			Window::Theme::ApplyDefaultWithPath(QString());
+		}
+	}
 	checkSystemDarkMode();
 	Ui::SetScreenReaderModeDisabled(
 		settings().readPref<bool>(kScreenReaderModeDisabledKey));

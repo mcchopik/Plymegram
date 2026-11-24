@@ -29,6 +29,24 @@ constexpr auto kNoAutoDownload = "plymegram-no-autodownload";
 constexpr auto kStaticEmoji = "plymegram-static-emoji";
 constexpr auto kShowIds = "show-peer-id-below-about";
 
+base::options::toggle CompactListOption({
+	.id = kCompactList,
+	.name = "Compact chat list",
+	.description = "Use compact chat list rows.",
+});
+
+base::options::toggle NoAutoDownloadOption({
+	.id = kNoAutoDownload,
+	.name = "Disable media auto-download",
+	.description = "Disable automatic media downloads.",
+});
+
+base::options::toggle StaticEmojiOption({
+	.id = kStaticEmoji,
+	.name = "Static emoji and stickers",
+	.description = "Disable animated emoji and stickers.",
+});
+
 void AddToggle(
 		not_null<Ui::VerticalLayout*> container,
 		rpl::producer<QString> text,
@@ -85,6 +103,11 @@ void ForkFeaturesBox(
 			: (PowerSaving::Current() & ~flags));
 	});
 	AddToggle(container, tr::lng_settings_fork_show_ids(), kShowIds);
+	Ui::AddDividerText(container, tr::lng_settings_fork_privacy());
+	AddToggle(container, tr::lng_settings_fork_no_read(), "plymegram-no-read-metrics");
+	AddToggle(container, tr::lng_settings_fork_no_promo(), "plymegram-no-promo-telemetry");
+	AddToggle(container, tr::lng_settings_fork_no_sponsored(), "plymegram-no-sponsored-view");
+	AddToggle(container, tr::lng_settings_fork_no_music(), "plymegram-no-music-listen");
 }
 
 } // namespace Settings

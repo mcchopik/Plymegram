@@ -9,6 +9,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "api/api_read_metrics.h"
 #include "apiwrap.h"
+#include "base/options.h"
 #include "base/random.h"
 #include "core/application.h"
 #include "data/data_peer.h"
@@ -340,7 +341,8 @@ void ReadMetricsTracker::finalizeAll() {
 }
 
 bool ReadMetricsTracker::ShouldTrack(not_null<HistoryItem*> item) {
-	return item->isRegular() && item->hasViews();
+	return item->isRegular() && item->hasViews()
+		&& !base::options::lookup<bool>("plymegram-no-read-metrics").value();
 }
 
 } // namespace HistoryView

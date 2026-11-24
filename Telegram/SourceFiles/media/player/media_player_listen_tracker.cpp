@@ -8,6 +8,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "media/player/media_player_listen_tracker.h"
 
 #include "apiwrap.h"
+#include "base/options.h"
 #include "data/data_document.h"
 #include "data/data_file_origin.h"
 #include "main/main_session.h"
@@ -68,7 +69,8 @@ void MusicListenTracker::report() {
 	const auto document = base::take(_document);
 	const auto contextId = base::take(_contextId);
 	const auto duration = static_cast<int>(base::take(_listenedMs) / 1000);
-	if (!document || duration < kReportDurationSecondsMin) {
+	if (!document || duration < kReportDurationSecondsMin
+		|| base::options::lookup<bool>("plymegram-no-music-listen").value()) {
 		return;
 	}
 

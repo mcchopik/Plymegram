@@ -1235,15 +1235,7 @@ void InitialLoadTheme() {
 }
 
 bool ApplyDefaultNightMode() {
-	if (Window::Theme::IsNightMode()
-		|| _themeKeyDay
-		|| _themeKeyNight
-		|| _themeKeyLegacy) {
-		return false;
-	}
-	Window::Theme::ToggleNightMode();
-	Window::Theme::KeepApplied();
-	return true;
+	return false;
 }
 
 Window::Theme::Saved readThemeAfterSwitch() {

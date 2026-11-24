@@ -1549,6 +1549,8 @@ PRIVATE
     intro/intro_signup.cpp
     intro/intro_signup.h
     intro/intro_start.cpp
+    intro/intro_theme.cpp
+    intro/intro_theme.h
     intro/intro_start.h
     intro/intro_step.cpp
     intro/intro_step.h

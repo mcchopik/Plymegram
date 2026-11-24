@@ -948,9 +948,6 @@ void BuildPerformanceSection(SectionBuilder &builder) {
 				.initialSelection = current,
 				.callback = [](int selection) {
 					SetInterfaceMode(selection);
-					PowerSaving::Set(selection == 2
-						? PowerSaving::kAll
-						: PowerSaving::Flags());
 					if (selection == 1 || selection == 3) {
 						const auto prefix = selection == 3
 							? u"hyperos"_q
@@ -959,7 +956,11 @@ void BuildPerformanceSection(SectionBuilder &builder) {
 							+ (Window::Theme::IsNightMode()
 								? u"-dark.tdesktop-theme"_q
 								: u"-day.tdesktop-theme"_q);
-						Window::Theme::ToggleNightMode(path);
+						Window::Theme::ApplyDefaultWithPath(path);
+						Window::Theme::KeepApplied();
+					} else {
+						Window::Theme::ApplyDefaultWithPath(QString());
+						Window::Theme::KeepApplied();
 					}
 				},
 			}));

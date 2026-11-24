@@ -983,6 +983,11 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_settings_fork_no_autodl" = "Disable media auto-download";
 "lng_settings_fork_static_emoji" = "Static emoji and stickers";
 "lng_settings_fork_show_ids" = "Show numeric IDs in profiles";
+"lng_settings_fork_privacy" = "Privacy: send data only when needed";
+"lng_settings_fork_no_read" = "Don't report message read timing";
+"lng_settings_fork_no_promo" = "Don't report promo screen events";
+"lng_settings_fork_no_sponsored" = "Don't report sponsored views/clicks";
+"lng_settings_fork_no_music" = "Don't report music listening";
 "lng_settings_power_title" = "Power Usage";
 "lng_settings_power_subtitle" = "Power saving options";
 "lng_settings_power_stickers" = "Animated Stickers";

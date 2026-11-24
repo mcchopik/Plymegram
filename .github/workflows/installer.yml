@@ -29,13 +29,14 @@ jobs:
         run: |
           $runId = '${{ inputs.run_id }}'
           if (-not $runId) {
-            $artifact = gh api repos/${{ github.repository }}/actions/artifacts/14716513724 2>$null | ConvertFrom-Json
-            $runId = $artifact.workflow_run.id
+            $runId = (gh api repos/${{ github.repository }}/actions/runs --jq '.workflow_runs[] | select(.conclusion=="success" and .name=="Plymegram Windows x64") | .id' | Select-Object -First 1)
           }
-          if (-not $runId) { throw 'No artifact run found' }
+          if (-not $runId) { throw 'No successful build run found' }
           Write-Host "Using run $runId"
+          $artifact = gh api "repos/${{ github.repository }}/actions/runs/$runId/artifacts" --jq '.artifacts[] | select(.name=="Plymegram-Windows-x64") | .id' | Select-Object -First 1
+          if (-not $artifact) { throw 'No exe artifact found in run' }
           $zip = Join-Path $env:RUNNER_TEMP 'artifact.zip'
-          Invoke-WebRequest -Uri "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/14716513724/zip" -Headers @{ Authorization = "Bearer $env:GH_TOKEN"; Accept = 'application/vnd.github+json' } -OutFile $zip
+          Invoke-WebRequest -Uri "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$artifact/zip" -Headers @{ Authorization = "Bearer $env:GH_TOKEN"; Accept = 'application/vnd.github+json' } -OutFile $zip
           Expand-Archive -Path $zip -DestinationPath exe -Force
           Get-ChildItem -Recurse exe | Select-Object FullName, Length
 

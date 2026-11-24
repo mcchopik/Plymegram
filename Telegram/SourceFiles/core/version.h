@@ -24,5 +24,5 @@ constexpr auto AppName = "Plymegram Desktop"_cs;
 constexpr auto AppFile = "Plymegram"_cs;
 constexpr auto AppVersion = 7004005;
 constexpr auto AppVersionStr = "7.4.5";
-constexpr auto AppBetaVersion = true;
+constexpr auto AppBetaVersion = false;
 constexpr auto AppAlphaVersion = TDESKTOP_ALPHA_VERSION;
