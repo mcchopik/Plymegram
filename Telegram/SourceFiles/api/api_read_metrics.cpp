@@ -8,6 +8,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "api/api_read_metrics.h"
 
 #include "apiwrap.h"
+#include "base/options.h"
 #include "data/data_peer.h"
 
 namespace Api {
@@ -48,6 +49,10 @@ void ReadMetrics::send() {
 				MTP_int(m.activeTimeInViewMs),
 				MTP_int(m.heightToViewportRatioPermille),
 				MTP_int(m.seenRangeRatioPermille)));
+		}
+		if (base::options::lookup<bool>("plymegram-no-read-metrics").value()) {
+			i = _pending.erase(i);
+			continue;
 		}
 		const auto peer = i->first;
 		const auto finish = [=] {

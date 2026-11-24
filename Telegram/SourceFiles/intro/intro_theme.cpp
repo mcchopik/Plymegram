@@ -37,7 +37,7 @@ ThemeWidget::ThemeWidget(
 void ThemeWidget::resizeEvent(QResizeEvent *e) {
 	Step::resizeEvent(e);
 	const auto x = contentLeft() + st::buttonRadius;
-	const auto y = errorTop() + st::introLinkTop;
+	const auto y = contentTop() + st::introDescriptionTop + st::introLinkTop * 3;
 	_light->moveToLeft(x, y);
 	_dark->moveToLeft(x + _light->width() + st::introLinkTop, y);
 }
