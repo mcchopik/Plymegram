@@ -1116,13 +1116,14 @@ void InnerWidget::paintEvent(QPaintEvent *e) {
 	auto dialogsClip = r;
 	const auto ms = crl::now();
 	const auto childListShown = _childListShown.current();
+	const auto bg = currentBg();
 	auto context = Ui::PaintContext{
 		.st = _st,
 		.topicJumpCache = _topicJumpCache.get(),
 		.folder = _openedFolder,
 		.forum = _openedForum,
 		.community = communityModeShown() ? _openedCommunity : nullptr,
-		.currentBg = currentBg(),
+		.currentBg = bg,
 		.filter = _filterId,
 		.now = ms,
 		.width = fullWidth,
@@ -1406,7 +1407,7 @@ void InnerWidget::paintEvent(QPaintEvent *e) {
 				if (reorderingPinned) {
 					const auto pinnedBottom = shownHeight(promoted + _pinnedRows.size());
 					const auto pinnedTop = shownHeight(promoted);
-					p.fillRect(0, pinnedTop - skippedTop, fullWidth, pinnedBottom - pinnedTop, currentBg());
+					p.fillRect(0, pinnedTop - skippedTop, fullWidth, pinnedBottom - pinnedTop, bg);
 				}
 
 				p.translate(0, top - skippedTop);
@@ -1441,7 +1442,7 @@ void InnerWidget::paintEvent(QPaintEvent *e) {
 				}
 			}
 		} else {
-			p.fillRect(dialogsClip, currentBg());
+			p.fillRect(dialogsClip, bg);
 		}
 		if (archiveShift) {
 			const auto transform = p.transform();
@@ -1459,7 +1460,7 @@ void InnerWidget::paintEvent(QPaintEvent *e) {
 					0,
 					fullWidth,
 					st::searchedBarHeight,
-					currentBg());
+					bg);
 				if (context.narrow) {
 					icon.paintInCenter(
 						p,
@@ -1536,7 +1537,7 @@ void InnerWidget::paintEvent(QPaintEvent *e) {
 		if (_searchTags) {
 			paintSearchTags(p, {
 				.st = &st::forumTopicRow,
-				.currentBg = currentBg(),
+				.currentBg = bg,
 				.now = ms,
 				.width = fullWidth,
 				.paused = videoPaused,
@@ -1567,7 +1568,7 @@ void InnerWidget::paintEvent(QPaintEvent *e) {
 				for (; from < to; ++from) {
 					const auto &result = _hashtagResults[from];
 					bool selected = (from == (isPressed() ? _hashtagPressed : _hashtagSelected));
-					p.fillRect(0, 0, fullWidth, st::mentionHeight, selected ? st::mentionBgOver : currentBg());
+					p.fillRect(0, 0, fullWidth, st::mentionHeight, selected ? st::mentionBgOver : bg);
 					result->row.paintRipple(p, 0, 0, fullWidth);
 					const auto &tag = result->tag;
 					if (selected) {
