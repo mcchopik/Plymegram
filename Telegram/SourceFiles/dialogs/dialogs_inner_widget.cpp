@@ -1134,6 +1134,7 @@ void InnerWidget::paintEvent(QPaintEvent *e) {
 		// We translate painter down, but it'll be cropped below rect.
 		p.fillRect(rect(), context.currentBg);
 	});
+	auto chatsFilterTags = std::vector<QImage*>();
 	const auto paintRow = [&](
 			not_null<Row*> row,
 			bool selected,
@@ -1208,7 +1209,7 @@ void InnerWidget::paintEvent(QPaintEvent *e) {
 			return;
 		}
 
-		auto chatsFilterTags = std::vector<QImage*>();
+		chatsFilterTags.clear();
 		if (context.narrow) {
 			context.chatsFilterTags = nullptr;
 		} else if (row->entry()->hasChatsFilterTags(context.filter)) {
@@ -1239,7 +1240,7 @@ void InnerWidget::paintEvent(QPaintEvent *e) {
 						continue;
 					}
 					const auto tagWidth = tag->width()
-						/ style::DevicePixelRatio();
+						/ cacheRatio;
 					if (availableWidth < tagWidth) {
 						more++;
 					} else {
@@ -1252,7 +1253,7 @@ void InnerWidget::paintEvent(QPaintEvent *e) {
 			if (more) {
 				if (const auto tag = cacheChatsFilterTag({}, more, a)) {
 					const auto tagWidth = tag->width()
-						/ style::DevicePixelRatio();
+						/ cacheRatio;
 					if (availableWidth < tagWidth) {
 						more++;
 						if (!chatsFilterTags.empty()) {
