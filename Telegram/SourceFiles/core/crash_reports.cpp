@@ -16,6 +16,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include <signal.h>
 #include <new>
 #include <mutex>
+#include <type_traits>
 
 #ifndef TDESKTOP_DISABLE_CRASH_REPORTS
 #ifdef Q_OS_WIN
@@ -86,34 +87,27 @@ void SafeWriteChar(char ch) {
 	fwrite(&ch, 1, 1, ReportFile);
 }
 
-template <bool Unsigned, typename Type>
-struct writeNumberSignAndRemoveIt {
-	static void call(Type &number) {
-		if (number < 0) {
-			SafeWriteChar('-');
-			number = -number;
-		}
-	}
-};
-template <typename Type>
-struct writeNumberSignAndRemoveIt<true, Type> {
-	static void call(Type &number) {
-	}
-};
-
 template <typename Type>
 const dump &SafeWriteNumber(const dump &stream, Type number) {
 	if (!ReportFile) return stream;
 
-	writeNumberSignAndRemoveIt<(Type(-1) > Type(0)), Type>::call(number);
-	Type upper = 1, prev = number / 10;
+	using Unsigned = std::make_unsigned_t<Type>;
+	const auto negative = (number < 0);
+	if (negative) {
+		SafeWriteChar('-');
+	}
+	auto value = static_cast<Unsigned>(number);
+	if (negative) {
+		value = Unsigned(0) - value;
+	}
+	Unsigned upper = 1, prev = value / 10;
 	while (prev >= upper) {
 		upper *= 10;
 	}
 	while (upper > 0) {
-		int digit = (number / upper);
+		const auto digit = int(value / upper);
 		SafeWriteChar('0' + digit);
-		number -= digit * upper;
+		value -= Unsigned(digit) * upper;
 		upper /= 10;
 	}
 	return stream;
