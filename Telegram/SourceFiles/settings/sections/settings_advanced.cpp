@@ -93,8 +93,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 namespace Settings {
 namespace {
 
-constexpr auto kInterfaceOption = "plymegram-interface";
-
 const auto kSettingsBackupPrefix = u"tdesktop-flags:"_q;
 constexpr auto kSettingsBackupMaxCompressed = 1024 * 1024;
 constexpr auto kSettingsBackupMaxDecoded = 8 * 1024 * 1024;
@@ -135,11 +133,11 @@ constexpr auto kSettingsBackupMaxDecoded = 8 * 1024 * 1024;
 }
 
 int InterfaceMode() {
-	return base::options::lookup<QString>(kInterfaceOption).value().toInt();
+	return base::options::lookup<QString>(Core::kInterfaceOption).value().toInt();
 }
 
 void SetInterfaceMode(int mode) {
-	base::options::lookup<QString>(kInterfaceOption).set(QString::number(mode));
+	base::options::lookup<QString>(Core::kInterfaceOption).set(QString::number(mode));
 }
 
 using namespace Builder;
