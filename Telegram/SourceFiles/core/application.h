@@ -128,6 +128,7 @@ enum class QuitReason {
 };
 
 extern const char kOptionSkipUrlSchemeRegister[];
+extern const char kInterfaceOption[];
 
 class Application final : public QObject {
 public:
