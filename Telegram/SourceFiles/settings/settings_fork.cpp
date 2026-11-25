@@ -118,7 +118,7 @@ void ForkFeaturesBox(
 	const auto family = container->lifetime().make_state<
 		rpl::variable<QString>
 	>(settings->customFontFamily());
-	const auto fontLabel = family->value() | rpl::map([](QString value) {
+	const auto fontLabel = family->value() | rpl::map([](const QString &value) {
 		return value.isEmpty()
 			? tr::lng_font_default(tr::now)
 			: (value == style::SystemFontTag())
