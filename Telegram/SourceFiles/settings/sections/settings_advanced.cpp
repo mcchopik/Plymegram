@@ -101,7 +101,7 @@ constexpr auto kSettingsBackupMaxDecoded = 8 * 1024 * 1024;
 	const auto flags = QByteArray::Base64UrlEncoding
 		| QByteArray::OmitTrailingEquals;
 	return kSettingsBackupPrefix
-		+ QString::fromLatin1(qCompress(json.toLatin1(), 9).toBase64(flags));
+		+ QString::fromLatin1(qCompress(json.toUtf8(), 9).toBase64(flags));
 }
 
 [[nodiscard]] QString DecodeSettingsBackup(const QString &text) {
