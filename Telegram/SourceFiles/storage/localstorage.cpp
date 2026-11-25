@@ -48,6 +48,7 @@ namespace {
 
 constexpr auto kThemeFileSizeLimit = 5 * 1024 * 1024;
 constexpr auto kFileLoaderQueueStopTimeout = crl::time(5000);
+constexpr auto kMaxRecentLanguages = 1024;
 
 constexpr auto kSavedBackgroundFormat = QImage::Format_ARGB32_Premultiplied;
 constexpr auto kWallPaperLegacySerializeTagId = int32(-111);
@@ -1342,7 +1343,7 @@ std::vector<Lang::Language> readRecentLanguages() {
 	}
 	qint32 count = 0;
 	languages.stream >> count;
-	if (count <= 0) {
+	if (count <= 0 || count > kMaxRecentLanguages) {
 		return {};
 	}
 	auto result = std::vector<Lang::Language>();
