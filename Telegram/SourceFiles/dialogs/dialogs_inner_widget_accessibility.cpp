@@ -105,26 +105,27 @@ namespace {
 
 	const auto &reactions = item->reactions();
 	if (!reactions.empty()) {
-		QStringList reactionParts;
+		auto reactionTexts = QString();
 		for (const auto &reaction : reactions) {
-			QString reactionText;
+			if (!reactionTexts.isEmpty()) {
+				reactionTexts += u", "_q;
+			}
 			if (reaction.id.paid()) {
-				reactionText = tr::lng_sr_chat_reaction_star(tr::now);
+				reactionTexts += tr::lng_sr_chat_reaction_star(tr::now);
 			} else if (const auto emoji = reaction.id.emoji(); !emoji.isEmpty()) {
-				reactionText = emoji;
+				reactionTexts += emoji;
 			} else {
-				reactionText = tr::lng_sr_chat_reaction_custom(tr::now);
+				reactionTexts += tr::lng_sr_chat_reaction_custom(tr::now);
 			}
 			if (reaction.count > 1) {
-				reactionText += u" "_q + QString::number(reaction.count);
+				reactionTexts.append(QChar(' ')).append(QString::number(reaction.count));
 			}
-			reactionParts << reactionText;
 		}
-		if (!reactionParts.isEmpty()) {
+		if (!reactionTexts.isEmpty()) {
 			parts << tr::lng_sr_chat_message_reactions(
 				tr::now,
 				lt_reactions,
-				reactionParts.join(u", "_q));
+				reactionTexts);
 		}
 	}
 
@@ -470,22 +471,23 @@ QString SubItemValue(
 		if (reactions.empty()) {
 			return {};
 		}
-		QStringList reactionParts;
+		auto reactionTexts = QString();
 		for (const auto &reaction : reactions) {
-			QString reactionText;
+			if (!reactionTexts.isEmpty()) {
+				reactionTexts += u", "_q;
+			}
 			if (reaction.id.paid()) {
-				reactionText = tr::lng_sr_chat_reaction_star(tr::now);
+				reactionTexts += tr::lng_sr_chat_reaction_star(tr::now);
 			} else if (const auto emoji = reaction.id.emoji(); !emoji.isEmpty()) {
-				reactionText = emoji;
+				reactionTexts += emoji;
 			} else {
-				reactionText = tr::lng_sr_chat_reaction_custom(tr::now);
+				reactionTexts += tr::lng_sr_chat_reaction_custom(tr::now);
 			}
 			if (reaction.count > 1) {
-				reactionText += u" "_q + QString::number(reaction.count);
+				reactionTexts.append(QChar(' ')).append(QString::number(reaction.count));
 			}
-			reactionParts << reactionText;
 		}
-		return reactionParts.join(u", "_q);
+		return reactionTexts;
 	}
 	case SubItem::Time: {
 		const auto chatItem = history->chatListMessage();
