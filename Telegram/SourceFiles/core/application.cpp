@@ -145,8 +145,6 @@ void SetCrashAnnotationsGL() {
 #endif // DESKTOP_APP_USE_ANGLE
 }
 
-constexpr auto kInterfaceOption = "plymegram-interface";
-
 base::options::option<QString> PlymegramInterfaceMode({
 	.id = kInterfaceOption,
 	.name = "Interface mode",
@@ -199,6 +197,7 @@ base::options::toggle OptionSkipUrlSchemeRegister({
 Application *Application::Instance = nullptr;
 
 const char kOptionSkipUrlSchemeRegister[] = "skip-url-scheme-register";
+const char kInterfaceOption[] = "plymegram-interface";
 
 struct Application::Private {
 	base::Timer quitTimer;
