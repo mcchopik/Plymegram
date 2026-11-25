@@ -92,13 +92,12 @@ const dump &SafeWriteNumber(const dump &stream, Type number) {
 	if (!ReportFile) return stream;
 
 	using Unsigned = std::make_unsigned_t<Type>;
-	const auto negative = (number < 0);
-	if (negative) {
-		SafeWriteChar('-');
-	}
 	auto value = static_cast<Unsigned>(number);
-	if (negative) {
-		value = Unsigned(0) - value;
+	if constexpr (std::is_signed_v<Type>) {
+		if (number < 0) {
+			SafeWriteChar('-');
+			value = Unsigned(0) - value;
+		}
 	}
 	Unsigned upper = 1, prev = value / 10;
 	while (prev >= upper) {
