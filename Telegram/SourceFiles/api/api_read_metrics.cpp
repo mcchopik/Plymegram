@@ -33,11 +33,11 @@ void ReadMetrics::add(
 }
 
 void ReadMetrics::send() {
+	if (base::options::lookup<bool>("plymegram-no-read-metrics").value()) {
+		_pending.clear();
+		return;
+	}
 	for (auto i = _pending.begin(); i != _pending.end();) {
-		if (base::options::lookup<bool>("plymegram-no-read-metrics").value()) {
-			i = _pending.erase(i);
-			continue;
-		}
 		if (_requests.contains(i->first)) {
 			++i;
 			continue;
