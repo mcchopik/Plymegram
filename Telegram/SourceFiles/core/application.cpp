@@ -354,6 +354,14 @@ Application::~Application() {
 	Instance = nullptr;
 }
 
+int Application::interfaceMode() {
+	if (!_interfaceMode.has_value()) {
+		_interfaceMode = base::options::lookup<QString>(
+			kInterfaceOption).value().toInt();
+	}
+	return *_interfaceMode;
+}
+
 void Application::run() {
 	// Depends on OpenSSL on macOS, so on ThirdParty::start().
 	// Depends on notifications settings.
@@ -413,8 +421,7 @@ void Application::run() {
 		PowerSaving::SetForceAll(saving && !ignore);
 	}, _lifetime);
 
-	const auto interfaceMode = base::options::lookup<QString>(kInterfaceOption).value().toInt();
-	if (interfaceMode == 2) {
+	if (interfaceMode() == 2) {
 		PowerSaving::Set(PowerSaving::kAll);
 	}
 
@@ -615,7 +622,7 @@ void Application::startSettingsAndBackground() {
 	Window::Theme::Background()->start();
 	Local::ApplyDefaultNightMode();
 	{
-		const auto mode = base::options::lookup<QString>(kInterfaceOption).value().toInt();
+		const auto mode = interfaceMode();
 		if (mode == 1 || mode == 3) {
 			const auto prefix = mode == 3
 				? u"hyperos"_q

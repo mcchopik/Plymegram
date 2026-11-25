@@ -379,6 +379,7 @@ private:
 	friend Application &App();
 
 	void autoRegisterUrlScheme();
+	[[nodiscard]] int interfaceMode();
 	void clearEmojiSourceImages();
 	[[nodiscard]] auto prepareEmojiSourceImages()
 		-> std::shared_ptr<Ui::Emoji::UniversalImages>;
@@ -491,6 +492,7 @@ private:
 	std::optional<QPointer<QWidget>> _startUrlActivated;
 
 	std::optional<base::Timer> _saveSettingsTimer;
+	std::optional<int> _interfaceMode;
 
 	struct LeaveFilter {
 		std::vector<QPointer<QWidget>> registered;
