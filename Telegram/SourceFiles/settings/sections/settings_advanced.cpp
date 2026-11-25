@@ -1395,7 +1395,7 @@ void BuildExportSection(SectionBuilder &builder) {
 
 	builder.addButton({
 		.id = u"advanced/backup_settings_export"_q,
-		.title = u"Backup settings"_q,
+		.title = rpl::single(u"Backup settings"_q),
 		.icon = { &st::menuIconExport },
 		.onClick = [=] {
 			const auto weak = base::make_weak(controller);
@@ -1431,7 +1431,7 @@ void BuildExportSection(SectionBuilder &builder) {
 
 	builder.addButton({
 		.id = u"advanced/backup_settings_import"_q,
-		.title = u"Import settings backup"_q,
+		.title = rpl::single(u"Import settings backup"_q),
 		.icon = { &st::menuIconImportTheme },
 		.onClick = [=] {
 			const auto weak = base::make_weak(controller);
