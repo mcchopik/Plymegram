@@ -1387,26 +1387,34 @@ void GlobalPeersController::fill() {
 void GlobalPeersController::appendRow(not_null<PeerData*> peer) {
 	auto row = std::make_unique<ChannelRow>(peer);
 	row->setActive(isActive(peer));
-	auto status = QStringList();
+	auto status = QString();
 	if (const auto username = peer->username(); !username.isEmpty()) {
-		status.push_back('@' + username);
+		status = '@' + username;
 	}
 	const auto channel = peer->asChannel();
 	const auto user = peer->asUser();
 	const auto info = user ? user->botInfo.get() : nullptr;
 	if (channel && channel->membersCountKnown()) {
-		status.push_back(tr::lng_chat_status_subscribers(
+		const auto count = tr::lng_chat_status_subscribers(
 			tr::now,
 			lt_count_decimal,
-			channel->membersCount()));
+			channel->membersCount());
+		if (!status.isEmpty()) {
+			status += u", "_q;
+		}
+		status += count;
 	} else if (info && info->activeUsers) {
-		status.push_back(tr::lng_bot_status_users(
+		const auto count = tr::lng_bot_status_users(
 			tr::now,
 			lt_count_decimal,
-			info->activeUsers));
+			info->activeUsers);
+		if (!status.isEmpty()) {
+			status += u", "_q;
+		}
+		status += count;
 	}
 	if (!status.isEmpty()) {
-		row->setCustomStatus(status.join(u", "_q));
+		row->setCustomStatus(status);
 	}
 	delegate()->peerListAppendRow(std::move(row));
 }
