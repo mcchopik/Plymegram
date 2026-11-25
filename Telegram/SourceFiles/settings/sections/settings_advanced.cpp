@@ -117,10 +117,11 @@ constexpr auto kSettingsBackupMaxDecoded = 8 * 1024 * 1024;
 		std::move(encoded),
 		QByteArray::Base64UrlEncoding
 			| QByteArray::AbortOnBase64DecodingErrors);
-	if (!compressed || compressed->isEmpty()) {
+	if (compressed.conversionStatus != QByteArray::Base64DecodingStatus::Ok
+		|| compressed.decoded.isEmpty()) {
 		return QString();
 	}
-	const auto decoded = qUncompress(*compressed);
+	const auto decoded = qUncompress(compressed.decoded);
 	if (decoded.isEmpty() || decoded.size() > kSettingsBackupMaxDecoded) {
 		return QString();
 	}
