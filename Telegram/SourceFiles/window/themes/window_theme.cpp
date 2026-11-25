@@ -71,11 +71,19 @@ inline bool AreTestingTheme() {
 }
 
 [[nodiscard]] QImage ReadDefaultImage() {
-	return Ui::ReadBackgroundImage(
-		u":/gui/art/background.tgv"_q,
-		QByteArray(),
-		true
-	).image;
+	static auto cached = std::pair<qreal, QImage>(0., QImage());
+	const auto ratio = style::DevicePixelRatio();
+	if (cached.first != ratio || cached.second.isNull()) {
+		cached = {
+			ratio,
+			Ui::ReadBackgroundImage(
+				u":/gui/art/background.tgv"_q,
+				QByteArray(),
+				true
+			).image,
+		};
+	}
+	return cached.second;
 }
 
 [[nodiscard]] bool GoodImageFormatAndSize(const QImage &image) {
@@ -731,7 +739,11 @@ QImage ChatBackground::postprocessBackgroundImage(QImage image) {
 }
 
 void ChatBackground::set(const Data::WallPaper &paper, QImage image) {
-	image = Ui::PreprocessBackgroundImage(std::move(image));
+	const auto usingThemeBackground = Data::IsThemeWallPaper(paper)
+		&& !_themeImage.isNull();
+	if (!usingThemeBackground) {
+		image = Ui::PreprocessBackgroundImage(std::move(image));
+	}
 
 	const auto needResetAdjustable = Data::IsDefaultWallPaper(paper)
 		&& !Data::IsDefaultWallPaper(_paper)
