@@ -395,10 +395,16 @@ void SponsoredMessages::requestForVideo(
 	}
 	const auto finish = [=] {
 		const auto i = _requestsForVideo.find(peer);
-		if (i != end(_requestsForVideo)) {
-			for (const auto &callback : base::take(i->second.callbacks)) {
-				callback(prepareForVideo(peer));
-			}
+		if (i == end(_requestsForVideo)) {
+			return;
+		}
+		auto callbacks = base::take(i->second.callbacks);
+		if (callbacks.empty()) {
+			return;
+		}
+		const auto prepared = prepareForVideo(peer);
+		for (const auto &callback : callbacks) {
+			callback(prepared);
 		}
 	};
 	using Flag = MTPmessages_GetSponsoredMessages::Flag;
