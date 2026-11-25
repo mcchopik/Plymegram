@@ -1774,8 +1774,6 @@ void Transport::FinishWebview(uint64 generation) {
 			if (transport) {
 				transport->webviewUnavailable();
 			}
-		}
-		if (!retry) {
 			return;
 		}
 		global.webviewRetryScheduled = true;
